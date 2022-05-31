@@ -8,6 +8,7 @@ from colorama import Fore
 import time
 import re
 
+prefix = ">"
 colorama.init()
 
 try:
@@ -31,7 +32,7 @@ except:
 
 
 bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or(">"), help_command=None)
+    command_prefix=commands.when_mentioned_or(prefix), help_command=None)
 
 
 bot.add_cog(General(bot))
@@ -41,7 +42,7 @@ bot.add_cog(Errors(bot))
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="prefix is >"), status=discord.Status.idle)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"prefix is {prefix}"), status=discord.Status.idle)
     print(Fore.GREEN +
           f'Logged in as {bot.user} (Bot ID: {bot.user.id})' + Fore.RESET)
     print(Fore.YELLOW + "Invite the bot: " + Fore.CYAN +
