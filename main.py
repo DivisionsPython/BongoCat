@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from errors import Errors
 from fun import Fun
-from games import Games
+from hangman import Hangman
 from general import General
 import colorama
 from colorama import Fore
@@ -39,7 +39,7 @@ bot = commands.Bot(
 bot.add_cog(General(bot))
 bot.add_cog(Fun(bot))
 bot.add_cog(Errors(bot))
-bot.add_cog(Games(bot))
+bot.add_cog(Hangman(bot))
 
 
 @bot.event
