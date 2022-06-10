@@ -213,3 +213,44 @@ class Fun(commands.Cog):
             embed.title = "Who you wanna cuddle?"
             embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
+
+    @commands.command()
+    async def pat(self, ctx, member: discord.Member):
+        search_term = "anime headpat"
+        apikey = "DZ2JR8TMALJU"
+        lmt = 50
+
+        r = requests.get(
+            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+
+        gif_list = []
+        sadReplyList = [
+            f"I'm here for you {ctx.author.name} \U0001f97a", f"Aw {ctx.author.name} :("]
+
+        if r.status_code == 200:
+            data = r.json()
+            for details in data["results"]:
+                for media in details["media"]:
+                    gif_list.append(media["gif"]["url"])
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 Error connecting to the Tenor API"
+            embed.color = 0xff0000
+            return await ctx.channel.send(embed=embed)
+
+        if member == ctx.author:
+            await ctx.channel.send(random.choice(sadReplyList))
+        else:
+            embed = discord.Embed()
+            embed.title = f"{ctx.author.name} headpats {member.name}"
+            embed.color = 0xdda7ff
+            embed.set_image(url=random.choice(gif_list))
+            await ctx.channel.send(embed=embed)
+
+    @pat.error
+    async def hug_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = discord.Embed()
+            embed.title = "Who you wanna headpat?"
+            embed.color = 0xff0000
+            return await ctx.channel.send(embed=embed)
