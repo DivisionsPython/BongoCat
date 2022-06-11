@@ -10,3 +10,5 @@ class Errors(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             return await ctx.channel.send(error)
+        if isinstance(error, commands.MemberNotFound):
+            return await ctx.channel.send(error)

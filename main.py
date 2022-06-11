@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 from errors import Errors
-from fun import Fun
+from gifs import Gifs
 from hangman import Hangman
 from general import General
+from meters import Meters
 import colorama
 from colorama import Fore
 import time
@@ -37,9 +38,10 @@ bot = commands.Bot(
 
 
 bot.add_cog(General(bot))
-bot.add_cog(Fun(bot))
+bot.add_cog(Gifs(bot))
 bot.add_cog(Errors(bot))
 bot.add_cog(Hangman(bot))
+bot.add_cog(Meters(bot))
 
 
 @bot.event

@@ -5,7 +5,7 @@ import requests
 import json
 
 
-class Fun(commands.Cog):
+class Gifs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
