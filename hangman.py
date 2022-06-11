@@ -57,6 +57,7 @@ class Hangman(commands.Cog):
                         embed.add_field(name="Word status", value=str(
                             the_status), inline=False)
                         await embedToEdit.edit(embed=embed)
+
                     elif userGuess.content.lower() in guessedLetters:
                         embed = discord.Embed()
                         embed.title = "\u26d4 You already have guessed that letter before, try again."
@@ -66,6 +67,7 @@ class Hangman(commands.Cog):
                         embed.add_field(name="Word status", value=str(
                             the_status), inline=False)
                         await embedToEdit.edit(embed=embed)
+
                     elif userGuess.content.lower() not in randomWord:
                         embed = discord.Embed()
                         embed.title = "\u26d4 That letter is not present in the word!"
@@ -81,6 +83,7 @@ class Hangman(commands.Cog):
                         guessedLetters.append(userGuess.content.lower())
 
                         await embedToEdit.edit(embed=embed)
+
                     elif userGuess.content.lower() in randomWord:
                         embed = discord.Embed()
                         embed.title = "\u2705 Awesome, that letter is present in the word!"
@@ -93,6 +96,7 @@ class Hangman(commands.Cog):
                         guessedLetters.append(userGuess.content.lower())
 
                         await embedToEdit.edit(embed=embed)
+
                     else:
                         embed = discord.Embed()
                         embed.title = "\u26d4 Unexpected error, try again."
@@ -113,6 +117,7 @@ class Hangman(commands.Cog):
                         guess = True
 
                         await embedToEdit.edit(embed=embed)
+
                     else:
                         embed = discord.Embed()
                         embed.title = "\u26d4 That's not the word we are looking for, try again."
@@ -149,6 +154,7 @@ class Hangman(commands.Cog):
                     embed.color = 0x00e600
                     await embedToEdit.edit(embed=embed)
                     guess = True
+
                 elif attempts == 0:
                     embed = discord.Embed()
                     embed.title = "\U0001f615 Unfortunately, you ran out of guesses."
