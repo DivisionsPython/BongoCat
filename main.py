@@ -34,7 +34,7 @@ except:
 
 
 bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or(prefix), help_command=None)
+    command_prefix=commands.when_mentioned_or(prefix))
 
 
 bot.add_cog(General(bot))
