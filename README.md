@@ -8,9 +8,7 @@
 
 ## 📝 Description
 
-BongoCat is a Discord bot made for fun purposes, with minigames and user-interaction commands.
-
-It's really similar to bots like [**Dank Memer**](https://top.gg/bot/270904126974590976) and [**OwO**](https://top.gg/bot/408785106942164992). User-interaction commands, gifs, images, memes, and much more.
+It's really similar to bots like [**Dank Memer**](https://top.gg/bot/270904126974590976) and [**OwO**](https://top.gg/bot/408785106942164992). User-interaction commands, minigames, gifs, images, memes, and much more.
 
 ## 🔗 Documentation
 
