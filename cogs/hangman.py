@@ -172,3 +172,7 @@ class Hangman(commands.Cog):
             embed.title = "\u26d4 Unexpected error."
             embed.color = 0xff0000
             await embedToEdit.edit(embed=embed)
+
+
+def setup(bot):
+    bot.add_cog(Hangman(bot))

@@ -13,3 +13,7 @@ class General(commands.Cog):
     @commands.command()
     async def invite(self, ctx):
         await ctx.channel.send(f"**Invite me**: https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot")
+
+
+def setup(bot):
+    bot.add_cog(General(bot))

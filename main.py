@@ -1,10 +1,6 @@
 import discord
 from discord.ext import commands
-from errors import Errors
-from gifs import Gifs
-from hangman import Hangman
-from general import General
-from meters import Meters
+import os
 import colorama
 from colorama import Fore
 import time
@@ -24,11 +20,12 @@ except FileNotFoundError:
     print(Fore.RED + '"token.txt" file is missing. Creating a new file...' + Fore.RESET)
     newFile = open("token.txt", "x")
     newFile.close()
-    print(Fore.GREEN + 'A new "token.txt" file has been created. Please insert the bot token and try again.' + Fore.RESET)
+    print(Fore.GREEN + 'A new "token.txt" file has been created.' +
+          Fore.YELLOW + 'Please insert the bot token and try again.' + Fore.RESET)
     time.sleep(5)
     exit()
 except:
-    print(Fore.RED + 'Unexpected error! Check if you have provided the token in "token.txt". If the problem persists, open an issue on GitHub.' + Fore.RESET)
+    print(Fore.RED + 'Unexpected error! Check if you have provided the token in "token.txt" in the first line. If the problem persists, open an issue on GitHub.' + Fore.RESET)
     time.sleep(5)
     exit()
 
@@ -37,11 +34,10 @@ bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(prefix))
 
 
-bot.add_cog(General(bot))
-bot.add_cog(Gifs(bot))
-bot.add_cog(Errors(bot))
-bot.add_cog(Hangman(bot))
-bot.add_cog(Meters(bot))
+if __name__ == '__main__':
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            bot.load_extension(f'cogs.{filename[:-3]}')
 
 
 @bot.event
@@ -56,8 +52,7 @@ async def on_ready():
 @bot.event
 async def on_message(message: discord.Message) -> None:
     if re.fullmatch(rf"<@!?{bot.user.id}>", message.content):
-        await message.channel.send("No bitches? \U0001f610")
-        return
+        return await message.channel.send("No bitches? \U0001f610")
     await bot.process_commands(message)
 
 

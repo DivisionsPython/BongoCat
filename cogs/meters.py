@@ -104,3 +104,7 @@ class Meters(commands.Cog):
             embed.add_field(
                 name=f"{member.name}'s pp size \U0001f633", value=value)
             await ctx.channel.send(embed=embed)
+
+
+def setup(bot):
+    bot.add_cog(Meters(bot))

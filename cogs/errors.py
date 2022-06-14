@@ -12,3 +12,8 @@ class Errors(commands.Cog):
             return await ctx.channel.send(error)
         if isinstance(error, commands.MemberNotFound):
             return await ctx.channel.send(error)
+        return await ctx.channel.send(error)
+
+
+def setup(bot):
+    bot.add_cog(Errors(bot))

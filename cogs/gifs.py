@@ -295,3 +295,7 @@ class Gifs(commands.Cog):
             embed.title = "Who you wanna bonk?"
             embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
+
+
+def setup(bot):
+    bot.add_cog(Gifs(bot))
