@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+import traceback
+import sys
 
 
 class Errors(commands.Cog):
@@ -8,11 +10,11 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandNotFound):
-            return await ctx.channel.send(error)
-        if isinstance(error, commands.MemberNotFound):
-            return await ctx.channel.send(error)
-        return await ctx.channel.send(error)
+        return await ctx.channel.send(f"""
+```
+ERROR: {error}
+```
+        """)
 
 
 def setup(bot):
