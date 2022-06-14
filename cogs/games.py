@@ -5,7 +5,7 @@ import requests
 import random
 
 
-class Hangman(commands.Cog):
+class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -175,4 +175,4 @@ class Hangman(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Hangman(bot))
+    bot.add_cog(Games(bot))
