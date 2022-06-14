@@ -5,7 +5,7 @@ import colorama
 from colorama import Fore
 import re
 
-token = "OTQxMzAwODYxNzg1NzM5MjY0.Ghni9-.fJQZ0ugUNa3XRZI0CNi1MtDF-UNyr3tEdN8Qno"
+token = "TOKEN"
 prefix = ">"
 
 colorama.init()
