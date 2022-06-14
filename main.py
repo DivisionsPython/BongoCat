@@ -35,9 +35,19 @@ bot = commands.Bot(
 
 
 if __name__ == '__main__':
-    for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
-            bot.load_extension(f'cogs.{filename[:-3]}')
+    for extension in [f.replace('.py', '') for f in os.listdir("owner") if os.path.isfile(os.path.join("owner", f))]:
+        try:
+            bot.load_extension("owner." + extension)
+        except (discord.ClientException, ModuleNotFoundError):
+            print(Fore.RED + 'Failed to load extension: ' +
+                  Fore.YELLOW + extension + Fore.RESET)
+
+    for extension in [f.replace('.py', '') for f in os.listdir("cogs") if os.path.isfile(os.path.join("cogs", f))]:
+        try:
+            bot.load_extension("cogs." + extension)
+        except (discord.ClientException, ModuleNotFoundError):
+            print(Fore.RED + 'Failed to load extension: ' +
+                  Fore.YELLOW + extension + Fore.RESET)
 
 
 @bot.event

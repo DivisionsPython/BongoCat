@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 
+# THIS FILE ONLY RELOADS EXTENSIONS FROM './cogs' DIRECTORY, NOT './owner'
+
 
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def unload(self, ctx, extension: str):
         try:
@@ -16,7 +18,7 @@ class Owner(commands.Cog):
         else:
             await ctx.send('**`SUCCESS`**')
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def load(self, ctx, extension: str):
         try:
@@ -26,7 +28,7 @@ class Owner(commands.Cog):
         else:
             await ctx.send('**`SUCCESS`**')
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def reload(self, ctx, extension: str):
         try:
