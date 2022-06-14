@@ -3,31 +3,12 @@ from discord.ext import commands
 import os
 import colorama
 from colorama import Fore
-import time
 import re
 
+token = "TOKEN"
 prefix = ">"
-colorama.init()
 
-try:
-    print(Fore.YELLOW + "Loading token..." + Fore.RESET)
-    with open("token.txt", "r") as f:
-        content = f.readlines()
-        token = content[0]
-        f.close()
-    print(Fore.GREEN + "Token loaded. Starting bot..." + Fore.RESET)
-except FileNotFoundError:
-    print(Fore.RED + '"token.txt" file is missing. Creating a new file...' + Fore.RESET)
-    newFile = open("token.txt", "x")
-    newFile.close()
-    print(Fore.GREEN + 'A new "token.txt" file has been created.' +
-          Fore.YELLOW + 'Please insert the bot token and try again.' + Fore.RESET)
-    time.sleep(5)
-    exit()
-except:
-    print(Fore.RED + 'Unexpected error! Check if you have provided the token in "token.txt" in the first line. If the problem persists, open an issue on GitHub.' + Fore.RESET)
-    time.sleep(5)
-    exit()
+colorama.init()
 
 
 bot = commands.Bot(
