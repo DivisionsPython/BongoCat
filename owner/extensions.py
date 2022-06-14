@@ -10,34 +10,43 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def unload(self, ctx, extension: str):
-        try:
-            self.bot.unload_extension(f'cogs.{extension.lower()}')
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+    async def unload(self, ctx, extension: str = None):
+        if not extension:
+            await ctx.channel.send("Which extension do you want to unload?")
         else:
-            await ctx.send('**`SUCCESS`**')
+            try:
+                self.bot.unload_extension(f'cogs.{extension.lower()}')
+            except Exception as e:
+                await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+            else:
+                await ctx.channel.send('**`SUCCESS`**')
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def load(self, ctx, extension: str):
-        try:
-            self.bot.load_extension(f'cogs.{extension.lower()}')
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+    async def load(self, ctx, extension: str = None):
+        if not extension:
+            await ctx.channel.send("Which extension do you want to load?")
         else:
-            await ctx.send('**`SUCCESS`**')
+            try:
+                self.bot.load_extension(f'cogs.{extension.lower()}')
+            except Exception as e:
+                await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+            else:
+                await ctx.channel.send('**`SUCCESS`**')
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx, extension: str):
-        try:
-            self.bot.unload_extension(f'cogs.{extension.lower()}')
-            self.bot.load_extension(f'cogs.{extension.lower()}')
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+    async def reload(self, ctx, extension: str = None):
+        if not extension:
+            await ctx.channel.send("Which extension do you want to reload?")
         else:
-            await ctx.send('**`SUCCESS`**')
+            try:
+                self.bot.unload_extension(f'cogs.{extension.lower()}')
+                self.bot.load_extension(f'cogs.{extension.lower()}')
+            except Exception as e:
+                await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+            else:
+                await ctx.channel.send('**`SUCCESS`**')
 
 
 def setup(bot):
