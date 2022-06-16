@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-# THIS FILE ONLY RELOADS EXTENSIONS FROM './cogs' DIRECTORY, NOT './owner'
-
 
 class Owner(commands.Cog):
     def __init__(self, bot):
@@ -10,12 +8,13 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def unload(self, ctx, extension: str = None):
-        if not extension:
+    async def unload(self, ctx, path: str = None, extension: str = None):
+        if not path or not extension:
             await ctx.channel.send("Which extension do you want to unload?")
         else:
             try:
-                self.bot.unload_extension(f'cogs.{extension.lower()}')
+                self.bot.unload_extension(
+                    f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:
@@ -23,12 +22,12 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def load(self, ctx, extension: str = None):
-        if not extension:
+    async def load(self, ctx, path: str = None, extension: str = None):
+        if not path or not extension:
             await ctx.channel.send("Which extension do you want to load?")
         else:
             try:
-                self.bot.load_extension(f'cogs.{extension.lower()}')
+                self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:
@@ -36,13 +35,14 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx, extension: str = None):
-        if not extension:
+    async def reload(self, ctx, path: str = None, extension: str = None):
+        if not path or not extension:
             await ctx.channel.send("Which extension do you want to reload?")
         else:
             try:
-                self.bot.unload_extension(f'cogs.{extension.lower()}')
-                self.bot.load_extension(f'cogs.{extension.lower()}')
+                self.bot.unload_extension(
+                    f'{path.lower()}.{extension.lower()}')
+                self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:

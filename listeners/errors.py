@@ -12,7 +12,8 @@ class Errors(commands.Cog):
     async def on_command_error(self, ctx, error):
         return await ctx.channel.send(f"""
 ```
-ERROR: {error}
+ERROR: {error.__class__.__name__}
+DESCRIPTION: {error}
 ```
         """)
 
