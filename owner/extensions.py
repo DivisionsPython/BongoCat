@@ -13,7 +13,7 @@ class Owner(commands.Cog):
             await ctx.channel.send("Which extension do you want to unload?")
         else:
             try:
-                self.bot.unload_extension(
+                await self.bot.unload_extension(
                     f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
@@ -27,7 +27,7 @@ class Owner(commands.Cog):
             await ctx.channel.send("Which extension do you want to load?")
         else:
             try:
-                self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
+                await self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:
@@ -40,14 +40,14 @@ class Owner(commands.Cog):
             await ctx.channel.send("Which extension do you want to reload?")
         else:
             try:
-                self.bot.unload_extension(
+                await self.bot.unload_extension(
                     f'{path.lower()}.{extension.lower()}')
-                self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
+                await self.bot.load_extension(f'{path.lower()}.{extension.lower()}')
             except Exception as e:
                 await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
             else:
                 await ctx.channel.send('**`SUCCESS`**')
 
 
-def setup(bot):
-    bot.add_cog(Owner(bot))
+async def setup(bot):
+    await bot.add_cog(Owner(bot))

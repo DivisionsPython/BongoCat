@@ -106,5 +106,5 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Meters(bot))
+async def setup(bot):
+    await bot.add_cog(Meters(bot))

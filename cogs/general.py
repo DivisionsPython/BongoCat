@@ -18,11 +18,11 @@ class General(commands.Cog):
         embed = discord.Embed()
         embed.title = "Click the link! \U0001f447"
         embed.color = 0xdda7ff
-        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
         embed.add_field(name="»»————-   ★   ————-««",
                         value=f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot")
         await ctx.channel.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(General(bot))
+async def setup(bot):
+    await bot.add_cog(General(bot))

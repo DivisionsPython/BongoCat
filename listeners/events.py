@@ -29,5 +29,5 @@ class Events(commands.Cog):
             return await message.channel.send("No bitches? \U0001f610")
 
 
-def setup(bot):
-    bot.add_cog(Events(bot))
+async def setup(bot):
+    await bot.add_cog(Events(bot))
