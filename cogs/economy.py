@@ -7,6 +7,15 @@ import asyncio
 from utils.economy_functions import add_user, fetch_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank
 
 
+class PrivateView(discord.ui.View):
+    def __init__(self, user: discord.User, *, timeout: int = 60):
+        super().__init__(timeout=timeout)
+        self.user = user
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user and interaction.user.id == self.user.id
+
+
 class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -35,7 +44,7 @@ class Economy(commands.Cog):
         if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
             buttonN = Button(label='Cancel', style=ButtonStyle.red)
-            view = View(timeout=60.0)
+            view = PrivateView(ctx.author)
 
             async def view_timeout():
                 embed = discord.Embed()
@@ -67,10 +76,6 @@ class Economy(commands.Cog):
 
             buttonN.callback = den_callback
             buttonY.callback = conf_callback
-
-            # def is_correct(m):
-            #    return m.author.id == ctx.author.id
-
             view.add_item(buttonY)
             view.add_item(buttonN)
 
