@@ -141,6 +141,8 @@ class Economy(commands.Cog):
             embed.color = 0xff0000
             await ctx.channel.send(embed=embed)
 
+        await cursor.close()
+
     @commands.command(aliases=["with"])
     async def withdraw(self, ctx, amount: int = None):
         cursor = await self.bot.connection.cursor()
@@ -185,6 +187,43 @@ class Economy(commands.Cog):
                             value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
             embed.color = 0xff0000
             await ctx.channel.send(embed=embed)
+
+        await cursor.close()
+
+    @commands.command(aliases=["bal"])
+    async def balance(self, ctx, member: discord.Member = None):
+        if not member:
+            member = ctx.author
+
+        cursor = await self.bot.connection.cursor()
+
+        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+            try:
+                wallet = await fetch_wallet(cursor, member.id)
+                bank = await fetch_bank(cursor, member.id)
+            except TypeError:
+                embed = discord.Embed()
+                embed.title = "\u26d4 This user hasn't an account yet"
+                embed.color = 0xff0000
+                await ctx.channel.send(embed=embed)
+            else:
+                embed = discord.Embed()
+                embed.title = f"\U0001f4b8 {member.name}'s balance"
+                embed.add_field(
+                    name="Wallet:", value=f"{wallet}$", inline=True)
+                embed.add_field(
+                    name="Bank:", value=f"{bank}$", inline=True)
+                embed.color = 0xdda7ff
+                await ctx.channel.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 You don't have an account!"
+            embed.add_field(name='Create a new account today! \U0001f389',
+                            value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
+
+        await cursor.close()
 
 
 async def setup(bot):
