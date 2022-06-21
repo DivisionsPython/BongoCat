@@ -5,7 +5,7 @@ import colorama
 from colorama import Fore
 import aiosqlite
 
-token = "TOKEN"
+token = "OTQxMzAwODYxNzg1NzM5MjY0.G8-gRs.ne41EFZw1a199qV0YU7E--h21lSrEb-79DNrOY"
 prefix = ">"
 intents = discord.Intents.all()
 

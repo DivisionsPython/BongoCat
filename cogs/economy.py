@@ -12,10 +12,32 @@ class Economy(commands.Cog):
     async def newaccount(self, ctx):
         cursor = await self.bot.connection.cursor()
         if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
-            await ctx.channel.send('You already have an account!')
+            embed = discord.Embed()
+            embed.title = "\u26d4 You already have an account!"
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
         else:
             await add_user(self.bot.connection, ctx.author.id)
-            await ctx.channel.send(f"{ctx.author.name}'s account added.")
+            embed = discord.Embed()
+            embed.title = f"\u2705 {ctx.author.name}'s account created"
+            embed.color = 0x00e600
+            await ctx.channel.send(embed=embed)
+        await cursor.close()
+
+    @commands.command()
+    async def delaccount(self, ctx):
+        cursor = await self.bot.connection.cursor()
+        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+            await delete_user(self.bot.connection, ctx.author.id)
+            embed = discord.Embed()
+            embed.title = f"\u2705 {ctx.author.name}'s account deleted"
+            embed.color = 0x00e600
+            await ctx.channel.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 You don't have an account!"
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
         await cursor.close()
 
 

@@ -1,14 +1,12 @@
 async def add_user(db, user, wallet=0, bank=0):
     cursor = await db.cursor()
-    async with db:
-        await cursor.execute('INSERT INTO eco VALUES (:user_id, :wallet, :bank)', {
-            'user_id': user, 'wallet': wallet, 'bank': bank})
+    await cursor.execute('INSERT INTO eco VALUES (:user_id, :wallet, :bank)', {'user_id': user, 'wallet': wallet, 'bank': bank})
+    await db.commit()
     await cursor.close()
 
 
 async def fetch_user(cursor,  user):
-    await cursor.execute('SELECT user_id FROM eco WHERE user_id = :user_id',
-                         {'user_id': user})
+    await cursor.execute('SELECT user_id FROM eco WHERE user_id = :user_id', {'user_id': user})
     output = await cursor.fetchone()
     if output is not None:
         return output[0]
@@ -30,23 +28,20 @@ async def fetch_bank(cursor, user):
 
 async def delete_user(db, user):
     cursor = await db.cursor()
-    async with db:
-        await cursor.execute('DELETE from eco WHERE user_id = :user_id', {
-            'user_id': user})
+    await cursor.execute('DELETE from eco WHERE user_id = :user_id', {'user_id': user})
+    await db.commit()
     await cursor.close()
 
 
 async def update_wallet(db, user, wallet):
     cursor = await db.cursor()
-    async with db:
-        await cursor.execute('UPDATE eco SET wallet = :wallet WHERE user_id = :user_id', {
-            'user_id': user, 'wallet': wallet})
+    await cursor.execute('UPDATE eco SET wallet = :wallet WHERE user_id = :user_id', {'user_id': user, 'wallet': wallet})
+    await db.commit()
     await cursor.close()
 
 
 async def update_bank(db, user, bank):
     cursor = await db.cursor()
-    async with db:
-        await cursor.execute('UPDATE eco SET bank = :bank WHERE user_id = :user_id', {
-            'user_id': user, 'bank': bank})
+    await cursor.execute('UPDATE eco SET bank = :bank WHERE user_id = :user_id', {'user_id': user, 'bank': bank})
+    await db.commit()
     await cursor.close()
