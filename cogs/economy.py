@@ -1,3 +1,4 @@
+from utils.config import PREFIX
 import discord
 from discord import ButtonStyle
 from discord.ext import commands
@@ -20,7 +21,7 @@ class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=["addaccount", "createaccount"])
     async def newaccount(self, ctx):
         cursor = await self.bot.connection.cursor()
         if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
@@ -94,6 +95,96 @@ class Economy(commands.Cog):
             await ctx.channel.send(embed=embed)
 
         await cursor.close()
+
+    @commands.command(aliases=["dep"])
+    async def deposit(self, ctx, amount: int = None):
+        cursor = await self.bot.connection.cursor()
+        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+            wallet = await fetch_wallet(cursor, ctx.author.id)
+            bank = await fetch_bank(cursor, ctx.author.id)
+            if not amount:
+                embed = discord.Embed()
+                embed.title = '\u26d4 How much money do you want to deposit?'
+                embed.color = 0xff0000
+                await ctx.channel.send(embed=embed)
+            elif wallet < amount:
+                embed = discord.Embed()
+                embed.title = '\u26d4 Deposit denied'
+                if wallet == 0:
+                    embed.add_field(
+                        name="Reason:", value="Your wallet is empty.")
+                else:
+                    embed.add_field(
+                        name="Reason:", value=f"You can't deposit **{amount}$** in the bank because you only have **{wallet}$** in your wallet.")
+                embed.color = 0xff0000
+                await ctx.channel.send(embed=embed)
+            else:
+                await update_wallet(self.bot.connection, ctx.author.id, wallet-amount)
+                await update_bank(self.bot.connection, ctx.author.id, bank+amount)
+                wallet = await fetch_wallet(cursor, ctx.author.id)
+                bank = await fetch_bank(cursor, ctx.author.id)
+                embed = discord.Embed()
+                embed.title = '\u2705 Deposit successfull'
+                embed.add_field(name="Deposit amount:",
+                                value=f"{amount}$", inline=False)
+                embed.add_field(
+                    name="New wallet value:", value=f"{wallet}$", inline=True)
+                embed.add_field(
+                    name="New bank value:", value=f"{bank}$", inline=True)
+                embed.color = 0x00e600
+                await ctx.channel.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 You don't have an account!"
+            embed.add_field(name='Create a new account today! \U0001f389',
+                            value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
+
+    @commands.command(aliases=["with"])
+    async def withdraw(self, ctx, amount: int = None):
+        cursor = await self.bot.connection.cursor()
+        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+            wallet = await fetch_wallet(cursor, ctx.author.id)
+            bank = await fetch_bank(cursor, ctx.author.id)
+            if not amount:
+                embed = discord.Embed()
+                embed.title = '\u26d4 How much money do you want to withdraw?'
+                embed.color = 0xff0000
+                await ctx.channel.send(embed=embed)
+            elif bank < amount:
+                embed = discord.Embed()
+                embed.title = '\u26d4 Withdraw denied'
+                if bank == 0:
+                    embed.add_field(
+                        name="Reason:", value="Your bank is empty.")
+                else:
+                    embed.add_field(
+                        name="Reason:", value=f"You can't withdraw **{amount}$** because you only have **{bank}$** in your bank.")
+                embed.color = 0xff0000
+                await ctx.channel.send(embed=embed)
+            else:
+                await update_wallet(self.bot.connection, ctx.author.id, wallet+amount)
+                await update_bank(self.bot.connection, ctx.author.id, bank-amount)
+                wallet = await fetch_wallet(cursor, ctx.author.id)
+                bank = await fetch_bank(cursor, ctx.author.id)
+                embed = discord.Embed()
+                embed.title = '\u2705 Withdraw successfull'
+                embed.add_field(name="Withdraw amount:",
+                                value=f"{amount}$", inline=False)
+                embed.add_field(
+                    name="New wallet value:", value=f"{wallet}$", inline=True)
+                embed.add_field(
+                    name="New bank value:", value=f"{bank}$", inline=True)
+                embed.color = 0x00e600
+                await ctx.channel.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 You don't have an account!"
+            embed.add_field(name='Create a new account today! \U0001f389',
+                            value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
 
 
 async def setup(bot):
