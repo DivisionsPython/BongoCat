@@ -4,9 +4,8 @@ import os
 import colorama
 from colorama import Fore
 import aiosqlite
+from utils.config import TOKEN, PREFIX
 
-token = "TOKEN"
-prefix = ">"
 intents = discord.Intents.all()
 
 colorama.init()
@@ -57,6 +56,6 @@ class Bot(commands.Bot):
 
 
 bot = Bot(
-    command_prefix=commands.when_mentioned_or(prefix), intents=intents)
+    command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
 
-bot.run(token)
+bot.run(TOKEN)
