@@ -4,8 +4,16 @@ from discord import ButtonStyle
 from discord.ext import commands
 from discord.ui import Button, View
 import random
-import asyncio
+import requests
+import json
 from utils.economy_functions import add_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank, user_is_known
+
+
+def getName() -> str:
+    url = "https://raw.githubusercontent.com/datasets-io/male-first-names-en/master/lib/dataset.json"
+    f = requests.get(url)
+    namesList = json.loads(f.text)
+    return random.choice(namesList)
 
 
 class PrivateView(discord.ui.View):
@@ -35,7 +43,7 @@ class Economy(commands.Cog):
             embed = discord.Embed()
             embed.title = f"\u2705 {ctx.author.name}'s account created"
             embed.add_field(
-                name="Info", value='You have a 7% chance of getting a random amount of coins between **0$** and **100$**')
+                name="Info", value='You have a 0.07% chance of getting a random amount of coins between **0$** and **100$**')
             embed.color = 0x00e600
             await ctx.channel.send(embed=embed)
 
@@ -232,6 +240,50 @@ class Economy(commands.Cog):
             await ctx.channel.send(embed=embed)
 
         await cursor.close()
+
+    @commands.command()
+    @commands.cooldown(1, 30, commands.BucketType.user)
+    async def beg(self, ctx):
+        cursor = await self.bot.connection.cursor()
+        if await user_is_known(cursor, ctx.author.id):
+            if random.random() < 42/100:  # chance of the beg to be successful
+
+                wallet = await fetch_wallet(cursor, ctx.author.id)
+
+                if random.random() < 8/100:  # chance of the beg to give more than 500 coins
+                    amount = random.randrange(500, 1001)
+                else:  # else less than 500 coins
+                    amount = random.randrange(1, 500)
+
+                await update_wallet(self.bot.connection, ctx.author.id, wallet+amount)
+
+                if amount > 500:
+                    await ctx.channel.send(f"You got very lucky, {getName()} gave you **{amount}$**")
+                else:
+                    await ctx.channel.send(f"Good job, {getName()} gave you **{amount}$**")
+
+            else:
+                await ctx.channel.send(f"Unfortunately, {getName()} didn't want to give you any money.")
+
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 You don't have an account!"
+            embed.add_field(name='Create a new account today! \U0001f389',
+                            value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
+
+        await cursor.close()
+
+    @beg.error
+    async def beg_timeout(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            embed = discord.Embed()
+            embed.title = "\u26d4 Cooldown"
+            embed.add_field(name='Come on bro, chill',
+                            value=f"You've already begged recently. Try again in **{round(error.retry_after)}s**")
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message):

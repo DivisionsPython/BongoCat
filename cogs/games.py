@@ -12,7 +12,7 @@ class Games(commands.Cog):
     @commands.command()
     async def hangman(self, ctx):
 
-        def getWord():
+        def getWord() -> str:
             url = "https://raw.githubusercontent.com/meetDeveloper/freeDictionaryAPI/master/meta/wordList/english.txt"
             f = requests.get(url)
             words = f.text.splitlines()
