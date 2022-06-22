@@ -14,6 +14,10 @@ async def fetch_user(cursor,  user):
         return output
 
 
+async def user_is_known(cursor, user) -> bool:
+    return await fetch_user(cursor, user) == user
+
+
 async def fetch_wallet(cursor,  user):
     await cursor.execute('SELECT wallet FROM eco WHERE user_id = :user_id',
                          {'user_id': user})

@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 import random
 import asyncio
-from utils.economy_functions import add_user, fetch_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank
+from utils.economy_functions import add_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank, user_is_known
 
 
 class PrivateView(discord.ui.View):
@@ -24,7 +24,7 @@ class Economy(commands.Cog):
     @commands.command(aliases=["addaccount", "createaccount"])
     async def newaccount(self, ctx):
         cursor = await self.bot.connection.cursor()
-        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+        if await user_is_known(cursor, ctx.author.id):
             embed = discord.Embed()
             embed.title = "\u26d4 You already have an account!"
             embed.color = 0xff0000
@@ -34,6 +34,8 @@ class Economy(commands.Cog):
 
             embed = discord.Embed()
             embed.title = f"\u2705 {ctx.author.name}'s account created"
+            embed.add_field(
+                name="Info", value='You have a 7% chance of getting a random amount of coins between **0$** and **100$**')
             embed.color = 0x00e600
             await ctx.channel.send(embed=embed)
 
@@ -42,7 +44,7 @@ class Economy(commands.Cog):
     @commands.command()
     async def delaccount(self, ctx):
         cursor = await self.bot.connection.cursor()
-        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+        if await user_is_known(cursor, ctx.author.id):
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
             buttonN = Button(label='Cancel', style=ButtonStyle.red)
             view = PrivateView(ctx.author)
@@ -99,7 +101,7 @@ class Economy(commands.Cog):
     @commands.command(aliases=["dep"])
     async def deposit(self, ctx, amount: int = None):
         cursor = await self.bot.connection.cursor()
-        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+        if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
             bank = await fetch_bank(cursor, ctx.author.id)
             if not amount:
@@ -146,7 +148,7 @@ class Economy(commands.Cog):
     @commands.command(aliases=["with"])
     async def withdraw(self, ctx, amount: int = None):
         cursor = await self.bot.connection.cursor()
-        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
+        if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
             bank = await fetch_bank(cursor, ctx.author.id)
             if not amount:
@@ -197,8 +199,8 @@ class Economy(commands.Cog):
 
         cursor = await self.bot.connection.cursor()
 
-        if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
-            if await fetch_user(cursor, member.id) == member.id:
+        if await user_is_known(cursor, ctx.author.id):
+            if await user_is_known(cursor, member.id):
                 try:
                     wallet = await fetch_wallet(cursor, member.id)
                     bank = await fetch_bank(cursor, member.id)
@@ -228,6 +230,21 @@ class Economy(commands.Cog):
                             value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
             embed.color = 0xff0000
             await ctx.channel.send(embed=embed)
+
+        await cursor.close()
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        cursor = await self.bot.connection.cursor()
+        if await user_is_known(cursor, message.author.id):
+            if random.random() < 0.07/100:
+                wallet = await fetch_wallet(cursor, message.author.id)
+                amount = random.randrange(0, 101)
+                if amount == 0:
+                    await message.channel.send(f"Sadly, {message.author.name} found a wallet on the street but it was empty \U0001f614")
+                else:
+                    await update_wallet(self.bot.connection, message.author.id, wallet+amount)
+                    await message.channel.send(f"{message.author.name}, you got lucky and randomly gained {amount}$ \U0001f604")
 
         await cursor.close()
 
