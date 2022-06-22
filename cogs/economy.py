@@ -198,22 +198,28 @@ class Economy(commands.Cog):
         cursor = await self.bot.connection.cursor()
 
         if await fetch_user(cursor, ctx.author.id) == ctx.author.id:
-            try:
-                wallet = await fetch_wallet(cursor, member.id)
-                bank = await fetch_bank(cursor, member.id)
-            except TypeError:
+            if await fetch_user(cursor, member.id) == member.id:
+                try:
+                    wallet = await fetch_wallet(cursor, member.id)
+                    bank = await fetch_bank(cursor, member.id)
+                except:
+                    embed = discord.Embed()
+                    embed.title = "\u26d4 Unexpected error"
+                    embed.color = 0xff0000
+                    await ctx.channel.send(embed=embed)
+                else:
+                    embed = discord.Embed()
+                    embed.title = f"\U0001f4b8 {member.name}'s balance"
+                    embed.add_field(
+                        name="Wallet:", value=f"{wallet}$", inline=True)
+                    embed.add_field(
+                        name="Bank:", value=f"{bank}$", inline=True)
+                    embed.color = 0xdda7ff
+                    await ctx.channel.send(embed=embed)
+            else:
                 embed = discord.Embed()
                 embed.title = "\u26d4 This user hasn't an account yet"
                 embed.color = 0xff0000
-                await ctx.channel.send(embed=embed)
-            else:
-                embed = discord.Embed()
-                embed.title = f"\U0001f4b8 {member.name}'s balance"
-                embed.add_field(
-                    name="Wallet:", value=f"{wallet}$", inline=True)
-                embed.add_field(
-                    name="Bank:", value=f"{bank}$", inline=True)
-                embed.color = 0xdda7ff
                 await ctx.channel.send(embed=embed)
         else:
             embed = discord.Embed()
