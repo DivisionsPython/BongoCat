@@ -33,16 +33,19 @@ class General(commands.Cog):
         if not member:
             member = ctx.author
 
+        button = Button(
+            label='Download avatar', url=str(member.avatar.url), style=ButtonStyle.url)
+        view = View()
+        view.add_item(button)
+
         embed = discord.Embed()
         embed.title = f"{member.name}'s avatar"
-        embed.add_field(name="Download image",
-                        value=f"[Click here]({member.avatar.url})")
         embed.set_image(url=str(member.avatar.url))
         embed.set_footer(
             text=f"Requested by {ctx.author.name}", icon_url=str(ctx.author.avatar.url))
         embed.timestamp = datetime.datetime.now()
         embed.color = 0xdda7ff
-        await ctx.channel.send(embed=embed)
+        await ctx.channel.send(embed=embed, view=view)
 
 
 async def setup(bot):
