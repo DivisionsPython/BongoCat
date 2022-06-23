@@ -64,6 +64,8 @@ class General(commands.Cog):
                 embed.title = f"{member.name} is listening to"
                 embed.add_field(name=activity.title,
                                 value=f'by {", ".join(activity.artists)}')
+                embed.set_thumbnail(
+                    url="https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/spotify_icon.png")
                 embed.set_image(url=str(activity.album_cover_url))
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=str(ctx.author.avatar.url))
