@@ -3,6 +3,7 @@ import discord
 from discord import ButtonStyle
 from discord.ext import commands
 from discord.ui import Button, View
+from utils.subclasses import PrivateView
 import random
 import requests
 import json
@@ -14,15 +15,6 @@ def getName() -> str:
     f = requests.get(url)
     namesList = json.loads(f.text)
     return random.choice(namesList)
-
-
-class PrivateView(discord.ui.View):
-    def __init__(self, user: discord.User, *, timeout: int = 60):
-        super().__init__(timeout=timeout)
-        self.user = user
-
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user and interaction.user.id == self.user.id
 
 
 class Economy(commands.Cog):
