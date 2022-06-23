@@ -3,6 +3,7 @@ from discord.ext import commands
 import datetime
 from discord.ui import Button, View
 from discord import ButtonStyle
+from discord import Spotify
 
 
 class General(commands.Cog):
@@ -46,6 +47,29 @@ class General(commands.Cog):
         embed.timestamp = datetime.datetime.now()
         embed.color = 0xdda7ff
         await ctx.channel.send(embed=embed, view=view)
+
+    @commands.command(aliases=["listening"])
+    async def spotify(self, ctx, member: discord.Member = None):
+        if not member:
+            member = ctx.author
+
+        for activity in member.activities:
+            if isinstance(activity, Spotify):
+                button = Button(
+                    label='Listen on Spotify', url=str(activity.track_url), style=ButtonStyle.url)
+                view = View()
+                view.add_item(button)
+
+                embed = discord.Embed()
+                embed.title = f"{member.name} is listening to"
+                embed.add_field(name=activity.title,
+                                value=f'by {", ".join(activity.artists)}')
+                embed.set_image(url=str(activity.album_cover_url))
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=str(ctx.author.avatar.url))
+                embed.timestamp = datetime.datetime.now()
+                embed.color = activity.colour
+                await ctx.channel.send(embed=embed, view=view)
 
 
 async def setup(bot):
