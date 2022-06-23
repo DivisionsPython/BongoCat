@@ -53,6 +53,13 @@ class General(commands.Cog):
         if not member:
             member = ctx.author
 
+        def convert(n) -> str:
+            days, seconds = n.days, n.seconds
+            hours = days * 24 + seconds // 3600
+            minutes = (seconds % 3600) // 60
+            seconds = (seconds % 60)
+            return hours, minutes, seconds
+
         for activity in member.activities:
             if isinstance(activity, Spotify):
                 button = Button(
@@ -60,10 +67,12 @@ class General(commands.Cog):
                 view = View()
                 view.add_item(button)
 
+                songLength = convert(activity.duration)
+
                 embed = discord.Embed()
                 embed.title = f"{member.name} is listening to"
                 embed.add_field(name=activity.title,
-                                value=f'by {", ".join(activity.artists)}')
+                                value=f'by {", ".join(activity.artists)}\nLength: **{songLength[0]}h {songLength[1]}m {songLength[2]}s**')
                 embed.set_thumbnail(
                     url="https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/spotify_icon.png")
                 embed.set_image(url=str(activity.album_cover_url))
@@ -72,6 +81,14 @@ class General(commands.Cog):
                 embed.timestamp = datetime.datetime.now()
                 embed.color = activity.colour
                 await ctx.channel.send(embed=embed, view=view)
+                break
+        else:
+            embed = discord.Embed()
+            embed.title = "\u26d4 No Spotify activity found"
+            embed.add_field(name='Maybe...',
+                            value=f"{member.name} might not be listening to Spotify, or maybe the activity is not displayed.")
+            embed.color = 0xff0000
+            await ctx.channel.send(embed=embed)
 
 
 async def setup(bot):
