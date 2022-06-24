@@ -11,7 +11,7 @@ class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=["latency"])
     async def ping(self, ctx):
         embed = ClassicDetailedEmbed(user=ctx.author)
         embed.title = f'\U0001f4e1 My latency is **{round(self.bot.latency * 1000)}ms**'

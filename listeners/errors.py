@@ -23,6 +23,10 @@ class Errors(commands.Cog):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
         else:
             exception_list = traceback.format_exception(

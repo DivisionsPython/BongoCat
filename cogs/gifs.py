@@ -46,6 +46,10 @@ class Gifs(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "Who you wanna kiss?"
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
     @commands.command()
     async def slap(self, ctx, member: discord.Member):
@@ -83,6 +87,10 @@ class Gifs(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = ErrorEmbed()
             embed.title = "Who you wanna slap?"
+            return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -122,6 +130,10 @@ class Gifs(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "Who you wanna punch?"
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
     @commands.command()
     async def hug(self, ctx, member: discord.Member):
@@ -159,6 +171,10 @@ class Gifs(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = ErrorEmbed()
             embed.title = "Who you wanna hug?"
+            return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -198,8 +214,12 @@ class Gifs(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "Who you wanna cuddle?"
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(aliases=["headpat"])
     async def pat(self, ctx, member: discord.Member):
         search_term = "anime headpat"
         apikey = "DZ2JR8TMALJU"
@@ -235,6 +255,10 @@ class Gifs(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = ErrorEmbed()
             embed.title = "Who you wanna headpat?"
+            return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MemberNotFound):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
 

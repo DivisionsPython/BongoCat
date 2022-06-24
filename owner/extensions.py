@@ -9,7 +9,7 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def unload(self, ctx, path: str = None, extension: str = None):
-        if not path or not extension:
+        if path == None or extension == None:
             await ctx.channel.send("Which extension do you want to unload?")
         else:
             try:
@@ -23,7 +23,7 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def load(self, ctx, path: str = None, extension: str = None):
-        if not path or not extension:
+        if path == None or extension == None:
             await ctx.channel.send("Which extension do you want to load?")
         else:
             try:
@@ -36,7 +36,7 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def reload(self, ctx, path: str = None, extension: str = None):
-        if not path or not extension:
+        if path == None or extension == None:
             await ctx.channel.send("Which extension do you want to reload?")
         else:
             try:

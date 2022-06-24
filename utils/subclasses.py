@@ -72,7 +72,7 @@ class ClassicEmbed(discord.Embed):
 
 class ClassicDetailedEmbed(discord.Embed):
     def __init__(self, user: discord.User, *, colour=0xdda7ff, timestamp=None):
-        if not timestamp:
+        if timestamp == None:
             timestamp = datetime.datetime.now()
 
         super().__init__(colour=colour, timestamp=timestamp)
@@ -100,7 +100,7 @@ class ErrorEmbed(discord.Embed):
 
 class ErrorReportEmbed(discord.Embed):
     def __init__(self, user: discord.User, *, colour=0xff0000, timestamp=None):
-        if not timestamp:
+        if timestamp == None:
             timestamp = datetime.datetime.now()
 
         super().__init__(colour=colour, timestamp=timestamp)

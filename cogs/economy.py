@@ -97,7 +97,7 @@ class Economy(commands.Cog):
         if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
             bank = await fetch_bank(cursor, ctx.author.id)
-            if not amount:
+            if amount == None:
                 embed = ErrorEmbed()
                 embed.title = '\u26d4 How much money do you want to deposit?'
                 await ctx.channel.send(embed=embed)
@@ -140,7 +140,7 @@ class Economy(commands.Cog):
         if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
             bank = await fetch_bank(cursor, ctx.author.id)
-            if not amount:
+            if amount == None:
                 embed = ErrorEmbed()
                 embed.title = '\u26d4 How much money do you want to withdraw?'
                 await ctx.channel.send(embed=embed)

@@ -14,7 +14,7 @@ class Welcomer(commands.Cog):
     async def welcome(self, ctx, channel: discord.TextChannel = None):
         error = ErrorEmbed()
         success = SuccessEmbed()
-        if not channel:
+        if channel == None:
             error.title = "\u26d4 No channel provided"
             await ctx.channel.send(embed=error)
         else:
