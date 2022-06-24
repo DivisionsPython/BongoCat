@@ -1,11 +1,6 @@
-import discord
 from discord.ext import commands
 import traceback
-import sys
-import colorama
-from colorama import Fore
-
-colorama.init()
+from utils.subclasses import ErrorEmbed, ErrorReportEmbed
 
 
 class Errors(commands.Cog):
@@ -25,7 +20,9 @@ class Errors(commands.Cog):
         error = getattr(error, 'original', error)
 
         if isinstance(error, commands.CommandNotFound):
-            return await ctx.channel.send(error)
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
         else:
             exception_list = traceback.format_exception(

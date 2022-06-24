@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import requests
-import json
+from utils.subclasses import ClassicEmbed, ClassicDetailedEmbed, ErrorEmbed
 
 
 class Gifs(commands.Cog):
@@ -28,26 +28,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} kisses {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @kiss.error
     async def kiss_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna kiss?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -69,26 +66,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} slaps {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @slap.error
     async def slap_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna slap?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -110,26 +104,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} punches {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @punch.error
     async def punch_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna punch?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -151,26 +142,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} hugs {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @hug.error
     async def hug_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna hug?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -192,26 +180,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} cuddles {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @cuddle.error
     async def cuddle_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna cuddle?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
     @commands.command()
@@ -233,67 +218,23 @@ class Gifs(commands.Cog):
                 for media in details["media"]:
                     gif_list.append(media["gif"]["url"])
         else:
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
-            embed = discord.Embed()
+            embed = ClassicEmbed()
             embed.title = f"{ctx.author.name} headpats {member.name}"
-            embed.color = 0xdda7ff
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
     @pat.error
     async def pat_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
+            embed = ErrorEmbed()
             embed.title = "Who you wanna headpat?"
-            embed.color = 0xff0000
-            return await ctx.channel.send(embed=embed)
-
-    @commands.command()
-    async def bonk(self, ctx, member: discord.Member):
-        search_term = "anime bonk"
-        apikey = "DZ2JR8TMALJU"
-        lmt = 50
-
-        r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
-
-        gif_list = []
-        sadReplyList = [
-            f"Chill {ctx.author.name}, Don't hurt yourself >:(", f"{ctx.author.name} why :("]
-
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
-            embed = discord.Embed()
-            embed.title = "\u26d4 Error connecting to the Tenor API"
-            embed.color = 0xff0000
-            return await ctx.channel.send(embed=embed)
-
-        if member == ctx.author:
-            await ctx.channel.send(random.choice(sadReplyList))
-        else:
-            embed = discord.Embed()
-            embed.title = f"{ctx.author.name} bonks {member.name}"
-            embed.color = 0xdda7ff
-            embed.set_image(url=random.choice(gif_list))
-            await ctx.channel.send(embed=embed)
-
-    @bonk.error
-    async def bonk_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed()
-            embed.title = "Who you wanna bonk?"
-            embed.color = 0xff0000
             return await ctx.channel.send(embed=embed)
 
 

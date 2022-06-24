@@ -1,6 +1,6 @@
 # BongoCat
 
-[![Status](https://img.shields.io/badge/Bot%20status-In%20developement%20--%20OFFLINE-critical?style=for-the-badge&logo=discord&logoColor=critical)](#)
+[![Status](https://img.shields.io/badge/Bot%20status-In%20development%20--%20OFFLINE-critical?style=for-the-badge&logo=discord&logoColor=critical)](#)
 
 ## 📌 Invite the bot
 

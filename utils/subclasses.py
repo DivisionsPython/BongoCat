@@ -5,6 +5,7 @@ import colorama
 from colorama import Fore
 import os
 import aiosqlite
+import datetime
 
 
 class Bot(commands.Bot):
@@ -62,3 +63,49 @@ class PrivateView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user and interaction.user.id == self.user.id
+
+
+class ClassicEmbed(discord.Embed):
+    def __init__(self, *, colour=0xdda7ff):
+        super().__init__(colour=colour)
+
+
+class ClassicDetailedEmbed(discord.Embed):
+    def __init__(self, user: discord.User, *, colour=0xdda7ff, timestamp=None):
+        if not timestamp:
+            timestamp = datetime.datetime.now()
+
+        super().__init__(colour=colour, timestamp=timestamp)
+        self.user = user
+        self.set_footer()
+
+    def set_footer(self):
+        return super().set_footer(text=f"Requested by {self.user.name}", icon_url=str(self.user.avatar.url))
+
+
+class SuccessEmbed(discord.Embed):
+    def __init__(self, *, colour=0x00e600):
+        super().__init__(colour=colour)
+
+
+class WarningEmbed(discord.Embed):
+    def __init__(self, *, colour=0xeed202):
+        super().__init__(colour=colour)
+
+
+class ErrorEmbed(discord.Embed):
+    def __init__(self, *, colour=0xff0000):
+        super().__init__(colour=colour)
+
+
+class ErrorReportEmbed(discord.Embed):
+    def __init__(self, user: discord.User, *, colour=0xff0000, timestamp=None):
+        if not timestamp:
+            timestamp = datetime.datetime.now()
+
+        super().__init__(colour=colour, timestamp=timestamp)
+        self.user = user
+        self.set_footer()
+
+    def set_footer(self):
+        return super().set_footer(text=f"Sent by {self.user.name}", icon_url=str(self.user.avatar.url))
