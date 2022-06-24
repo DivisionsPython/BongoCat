@@ -39,17 +39,20 @@ class Bot(commands.Bot):
         print(Fore.GREEN + "'cogs' extensions loaded." + Fore.RESET)
 
         try:
-            self.connection = await aiosqlite.connect('.\databases\eco.sqlite')
+            self.connection = await aiosqlite.connect('.\databases\database.sqlite')
             cursor = await self.connection.cursor()
             await cursor.execute('''CREATE TABLE IF NOT EXISTS eco (
                 user_id INTERGER, wallet INTERGER, bank INTERGER
                 )''')
+            await cursor.execute('''CREATE TABLE IF NOT EXISTS welcomer (
+                guild_id INTERGER, channel_id INTERGER, background INTERGER
+                )''')
             await self.connection.commit()
             await cursor.close()
         except:
-            print(Fore.RED + 'Error loading economy database' + Fore.RESET)
+            print(Fore.RED + 'Error loading database' + Fore.RESET)
         else:
-            print(Fore.GREEN + 'Economy database loaded' + Fore.RESET)
+            print(Fore.GREEN + 'Database loaded' + Fore.RESET)
 
 
 class PrivateView(discord.ui.View):
