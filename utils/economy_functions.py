@@ -5,7 +5,7 @@ async def add_user(db, user, wallet=0, bank=0):
     await cursor.close()
 
 
-async def fetch_user(cursor,  user):
+async def fetch_user(cursor, user):
     await cursor.execute('SELECT user_id FROM eco WHERE user_id = :user_id', {'user_id': user})
     output = await cursor.fetchone()
     if output is not None:
@@ -18,7 +18,7 @@ async def user_is_known(cursor, user) -> bool:
     return await fetch_user(cursor, user) == user
 
 
-async def fetch_wallet(cursor,  user):
+async def fetch_wallet(cursor, user):
     await cursor.execute('SELECT wallet FROM eco WHERE user_id = :user_id',
                          {'user_id': user})
     return (await cursor.fetchone())[0]
