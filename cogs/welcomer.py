@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 from utils.subclasses import PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
 from utils.welcomer_functions import fetch_background, update_background, delete_welcome_channel, set_welcome_channel, guild_is_known, fetch_channel, update_welcome_channel
+from easy_pil import Editor, load_image_async, Font
 
 
 class Welcomer(commands.Cog):
@@ -107,7 +108,6 @@ class Welcomer(commands.Cog):
         bg_length = len([name for name in os.listdir(
             dir) if os.path.isfile(os.path.join(dir, name))])
 
-        error = ErrorEmbed()
         success = SuccessEmbed()
 
         if background == None:
@@ -118,8 +118,9 @@ class Welcomer(commands.Cog):
                             value="Take a look to the list of backgrounds:")
 
             for times in range(bg_length):
+                url = f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg"
                 embed.add_field(
-                    name=f"Background {times + 1}", value="file.jpg", inline=False)
+                    name=f"Background {times + 1}", value=f"[Click here]({url})", inline=False)
 
             await ctx.channel.send(embed=embed)
         else:
@@ -142,11 +143,43 @@ class Welcomer(commands.Cog):
         await cursor.close()
 
     @background.error
-    async def not_a_number(self, ctx, error):
+    async def bg_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a valid background number"
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MissingPermissions):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to change the background"
+            return await ctx.channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        cursor = await self.bot.connection.cursor()
+        if await guild_is_known(cursor, member.guild.id):
+            bg = await fetch_background(cursor, member.guild.id)
+            channelID = await fetch_channel(cursor, member.guild.id)
+            channel = self.bot.get_channel(channelID)
+
+            background = Editor(f"./utils/img/bg/{bg}.jpg")
+            pfp = await load_image_async(str(member.avatar.url))
+            profile = Editor(pfp).resize((420, 420)).circle_image()
+
+            poppins = Font.poppins(size=130, variant='bold')
+            poppins_small = Font.poppins(size=75, variant='bold')
+
+            background.paste(profile, (750, 330))
+            background.ellipse((750, 330), 420, 420,
+                               outline='white', stroke_width=7)
+
+            background.text(
+                (960, 120), f"WELCOME TO {member.guild.name}", color='white', font=poppins, align='center')
+            background.text((960, 850), f"{member.name}#{member.discriminator}",
+                            color='white', font=poppins_small, align='center')
+
+            welcome_img = discord.File(
+                fp=background.image_bytes, filename="welcome.jpg")
+            await channel.send(f"{member.mention}", file=welcome_img)
 
 
 async def setup(bot):
