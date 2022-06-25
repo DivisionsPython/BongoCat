@@ -23,9 +23,13 @@ class Errors(commands.Cog):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
-        if isinstance(error, commands.MemberNotFound):
+        elif isinstance(error, commands.MemberNotFound):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
+        elif isinstance(error, commands.MissingPermissions):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
         else:

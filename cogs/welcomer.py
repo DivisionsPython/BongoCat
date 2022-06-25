@@ -13,6 +13,7 @@ class Welcomer(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["setwelcome", "welcomer", "welc"])
+    @commands.has_permissions(administrator=True)
     async def welcome(self, ctx, channel: discord.TextChannel = None):
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
@@ -42,6 +43,7 @@ class Welcomer(commands.Cog):
             await cursor.close()
 
     @commands.command(aliases=["deletewelcome", "nowelcome", "delwelcome"])
+    @commands.has_permissions(administrator=True)
     async def removewelcome(self, ctx):
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, ctx.guild.id):
@@ -99,8 +101,13 @@ class Welcomer(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a text channel"
             return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MissingPermissions):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to run this command"
+            return await ctx.channel.send(embed=embed)
 
     @commands.command(aliases=["setbackground", "bg", "setbg", "newbg", "newbackground", "updatebackground", "updatebg"])
+    @commands.has_permissions(administrator=True)
     async def background(self, ctx, background: int = None):
         cursor = await self.bot.connection.cursor()
 
@@ -155,9 +162,9 @@ class Welcomer(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a valid background number"
             return await ctx.channel.send(embed=embed)
-        if isinstance(error, commands.MissingPermissions):
+        elif isinstance(error, commands.MissingPermissions):
             embed = ErrorEmbed()
-            embed.title = "\u26d4 You don't have the perms to change the background"
+            embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
