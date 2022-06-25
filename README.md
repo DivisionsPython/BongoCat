@@ -8,7 +8,13 @@
 
 ## 📝 Description
 
-It's really similar to bots like [**Dank Memer**](https://top.gg/bot/270904126974590976) and [**OwO**](https://top.gg/bot/408785106942164992). User-interaction commands, minigames, gifs, images, memes, and much more.
+It's really similar to bots like [**Dank Memer**](https://top.gg/bot/270904126974590976) and [**OwO**](https://top.gg/bot/408785106942164992).
+
+- User-interaction commands
+- Minigames
+- Images and memes
+- Welcomer
+  and much more.
 
 ### The prefix is ">" but you can also mention the bot itself.
 
@@ -16,10 +22,27 @@ It's really similar to bots like [**Dank Memer**](https://top.gg/bot/27090412697
 
 [**Future docs website, needs to be developed**](#)
 
-## 🛠️ Technical description
+## ⚙️ Windows OS Installation
 
-This bot is built with [**Cogs**](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html?highlight=cog#cogs), this means that the commands are separated in different files and directories, so they can be sorted by categories.
+1. Download and install [**Git**](https://git-scm.com/download/)
+2. Run this command in the console:
 
-Each file contains the commands regarding its category, and those files get loaded by the main file, [**main.py**](main.py)
+```
+git clone https://github.com/madkarmaa/BongoCat.git
+```
 
-The bot owner ([**MadKarma**](https://discord.com/users/826489186327724095)) has the access to the [**Cogs loader**](./owner/extensions.py) commands.
+3. Install [**discord.py 2.0**](https://github.com/Rapptz/discord.py) using **Git**:
+
+```
+python -m pip install -U git+https://github.com/Rapptz/discord.py
+```
+
+4. Install the bot dependencies using `pip`:
+
+```
+cd BongoCat
+```
+
+```
+pip install -r requirements.txt
+```

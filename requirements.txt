@@ -1,0 +1,4 @@
+colorama
+aiosqlite
+easy-pil
+requests
