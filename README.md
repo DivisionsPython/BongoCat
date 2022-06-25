@@ -14,7 +14,8 @@ It's really similar to bots like [**Dank Memer**](https://top.gg/bot/27090412697
 - Minigames
 - Images and memes
 - Welcomer
-  and much more.
+
+and much more.
 
 ### The prefix is ">" but you can also mention the bot itself.
 
