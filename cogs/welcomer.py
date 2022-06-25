@@ -41,7 +41,7 @@ class Welcomer(commands.Cog):
 
             await cursor.close()
 
-    @commands.command(aliases=["deletewelcome", "nowelcome"])
+    @commands.command(aliases=["deletewelcome", "nowelcome", "delwelcome"])
     async def removewelcome(self, ctx):
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, ctx.guild.id):
@@ -104,41 +104,48 @@ class Welcomer(commands.Cog):
     async def background(self, ctx, background: int = None):
         cursor = await self.bot.connection.cursor()
 
-        dir = './utils/img/bg'
-        bg_length = len([name for name in os.listdir(
-            dir) if os.path.isfile(os.path.join(dir, name))])
+        if await guild_is_known(cursor, ctx.guild.id):
 
-        success = SuccessEmbed()
+            dir = './utils/img/bg'
+            bg_length = len([name for name in os.listdir(
+                dir) if os.path.isfile(os.path.join(dir, name))])
 
-        if background == None:
-            current_bg = await fetch_background(cursor, ctx.guild.id)
-            embed = ClassicEmbed()
-            embed.title = f"Current backgound index set to {current_bg}"
-            embed.add_field(name="Do you want to change it?",
-                            value="Take a look to the list of backgrounds:")
+            success = SuccessEmbed()
 
-            for times in range(bg_length):
-                url = f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg"
-                embed.add_field(
-                    name=f"Background {times + 1}", value=f"[Click here]({url})", inline=False)
+            if background == None:
+                current_bg = await fetch_background(cursor, ctx.guild.id)
+                embed = ClassicEmbed()
+                embed.title = f"Current backgound index set to {current_bg}"
+                embed.add_field(name="Do you want to change it?",
+                                value="Take a look to the list of backgrounds:")
 
-            await ctx.channel.send(embed=embed)
-        else:
-            if background > (bg_length + 1) or background == 0:
-                embed = ErrorEmbed()
-                embed.title = "\u26d4 That's not a valid background number"
+                for times in range(bg_length):
+                    url = f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg"
+                    embed.add_field(
+                        name=f"Background {times + 1}", value=f"[Click here]({url})", inline=False)
+
                 await ctx.channel.send(embed=embed)
             else:
-                try:
-                    await update_background(self.bot.connection, ctx.guild.id, background)
-                    current_bg = await fetch_background(cursor, ctx.guild.id)
-
-                    success.title = f"\u2705 New background index set to {current_bg}"
-                    await ctx.channel.send(embed=success)
-                except:
+                if background > (bg_length + 1) or background == 0:
                     embed = ErrorEmbed()
-                    embed.title = "\u26d4 Unexpected error"
+                    embed.title = "\u26d4 That's not a valid background number"
                     await ctx.channel.send(embed=embed)
+                else:
+                    try:
+                        await update_background(self.bot.connection, ctx.guild.id, background)
+                        current_bg = await fetch_background(cursor, ctx.guild.id)
+
+                        success.title = f"\u2705 New background index set to {current_bg}"
+                        await ctx.channel.send(embed=success)
+                    except:
+                        embed = ErrorEmbed()
+                        embed.title = "\u26d4 Unexpected error"
+                        await ctx.channel.send(embed=embed)
+
+        else:
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 There's no welcome channel set"
+            await ctx.channel.send(embed=embed)
 
         await cursor.close()
 
@@ -157,6 +164,7 @@ class Welcomer(commands.Cog):
     async def on_member_join(self, member):
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, member.guild.id):
+
             bg = await fetch_background(cursor, member.guild.id)
             channelID = await fetch_channel(cursor, member.guild.id)
             channel = self.bot.get_channel(channelID)
@@ -166,14 +174,21 @@ class Welcomer(commands.Cog):
             profile = Editor(pfp).resize((420, 420)).circle_image()
 
             poppins = Font.poppins(size=130, variant='bold')
+            poppins_outline = Font.poppins(size=132, variant='bold')
             poppins_small = Font.poppins(size=75, variant='bold')
+            poppins_small_outline = Font.poppins(size=76, variant='bold')
 
             background.paste(profile, (750, 330))
             background.ellipse((750, 330), 420, 420,
                                outline='white', stroke_width=7)
 
             background.text(
-                (960, 120), f"WELCOME TO {member.guild.name}", color='white', font=poppins, align='center')
+                (960, 124), f"Welcome to {member.guild.name}", color='black', font=poppins_outline, align='center')
+            background.text(
+                (960, 120), f"Welcome to {member.guild.name}", color='white', font=poppins, align='center')
+
+            background.text((960, 854), f"{member.name}#{member.discriminator}",
+                            color='black', font=poppins_small_outline, align='center')
             background.text((960, 850), f"{member.name}#{member.discriminator}",
                             color='white', font=poppins_small, align='center')
 

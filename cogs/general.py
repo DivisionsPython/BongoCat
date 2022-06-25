@@ -30,13 +30,21 @@ class General(commands.Cog):
 
     @commands.command(aliases=["av", "pfp"])
     async def avatar(self, ctx, member: discord.Member = None):
-        if not member:
+        if member == None:
             member = ctx.author
 
-        button = Button(
-            label='Download avatar', url=str(member.avatar.url), style=ButtonStyle.url)
+        user = await self.bot.fetch_user(member.id)
+
         view = View()
-        view.add_item(button)
+        button1 = Button(
+            label='Download avatar', url=str(user.avatar.url), style=ButtonStyle.url)
+        view.add_item(button1)
+        try:
+            button2 = Button(
+                label='Download banner', url=str(user.banner.url), style=ButtonStyle.url)
+            view.add_item(button2)
+        except:
+            pass
 
         embed = ClassicDetailedEmbed(user=ctx.author)
         embed.title = f"{member.name}'s avatar"
@@ -45,7 +53,7 @@ class General(commands.Cog):
 
     @commands.command(aliases=["listening"])
     async def spotify(self, ctx, member: discord.Member = None):
-        if not member:
+        if member == None:
             member = ctx.author
 
         def convert(n) -> str:
