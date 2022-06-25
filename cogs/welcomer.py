@@ -1,6 +1,6 @@
 import discord
 import os
-from discord import ButtonStyle, TextChannel
+from discord import ButtonStyle, Embed, TextChannel
 from discord.ext import commands
 from discord.ui import Button, View
 from utils.subclasses import PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
@@ -259,7 +259,15 @@ class Welcomer(commands.Cog):
 
             welcome_img = discord.File(
                 fp=background.image_bytes, filename="welcome.jpg")
-            await channel.send(f"{member.mention}", file=welcome_img)
+            try:
+                await channel.send(f"{member.mention}", file=welcome_img)
+            except AttributeError:
+                try:
+                    embed = ErrorEmbed()
+                    embed.title = "\u26d4 The welcome channel was not found in the server."
+                    await member.guild.system_channel.send(embed=embed)
+                except:
+                    pass
 
 
 async def setup(bot):
