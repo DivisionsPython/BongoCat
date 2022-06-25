@@ -42,6 +42,47 @@ class Welcomer(commands.Cog):
 
             await cursor.close()
 
+    @commands.command(aliases=["updatewelc", "upwelc"])
+    @commands.has_permissions(administrator=True)
+    async def updatewelcome(self, ctx, channel: discord.TextChannel = None):
+        cursor = await self.bot.connection.cursor()
+        error = ErrorEmbed()
+        success = SuccessEmbed()
+
+        if await guild_is_known(cursor, ctx.guild.id):
+            if channel == None:
+                error.title = "\u26d4 No channel provided"
+                await ctx.channel.send(embed=error)
+            elif await guild_is_known(cursor, ctx.guild.id) and await fetch_channel(cursor, ctx.guild.id) == channel.id:
+                embed = WarningEmbed()
+                embed.title = "\u26a0 That's the current welcome channel"
+                await ctx.channel.send(embed=embed)
+            else:
+                await update_welcome_channel(self.bot.connection, ctx.guild.id, channel.id)
+                channel_id = await fetch_channel(cursor, ctx.guild.id)
+                success.title = "\u2705 Welcome channel set"
+                success.add_field(
+                    name="Channel", value=f'<#{str(channel_id)}>')
+                await ctx.channel.send(embed=success)
+
+            await cursor.close()
+
+        else:
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 No welcome channel is set"
+            await ctx.channel.send(embed=embed)
+
+    @updatewelcome.error
+    async def wrong_channel2(self, ctx, error):
+        if isinstance(error, commands.ChannelNotFound):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 That's not a text channel"
+            return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MissingPermissions):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to run this command"
+            return await ctx.channel.send(embed=embed)
+
     @commands.command(aliases=["deletewelcome", "nowelcome", "delwelcome"])
     @commands.has_permissions(administrator=True)
     async def removewelcome(self, ctx):
@@ -171,17 +212,29 @@ class Welcomer(commands.Cog):
     async def on_member_join(self, member):
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, member.guild.id):
-
             bg = await fetch_background(cursor, member.guild.id)
             channelID = await fetch_channel(cursor, member.guild.id)
             channel = self.bot.get_channel(channelID)
+            server_name = str(member.guild.name)
 
             background = Editor(f"./utils/img/bg/{bg}.jpg")
             pfp = await load_image_async(str(member.avatar.url))
             profile = Editor(pfp).resize((420, 420)).circle_image()
 
-            poppins = Font.poppins(size=130, variant='bold')
-            poppins_outline = Font.poppins(size=132, variant='bold')
+            if len(member.guild.name) <= 20:
+                guild_name_font_size = 130
+                guild_name_font_outline_size = 132
+            elif 20 < len(member.guild.name) <= 25:
+                guild_name_font_size = 120
+                guild_name_font_outline_size = 122
+            else:
+                guild_name_font_size = 130
+                guild_name_font_outline_size = 132
+                server_name = "This server"
+
+            poppins = Font.poppins(size=guild_name_font_size, variant='bold')
+            poppins_outline = Font.poppins(
+                size=guild_name_font_outline_size, variant='bold')
             poppins_small = Font.poppins(size=75, variant='bold')
             poppins_small_outline = Font.poppins(size=76, variant='bold')
 
@@ -190,9 +243,14 @@ class Welcomer(commands.Cog):
                                outline='white', stroke_width=7)
 
             background.text(
-                (960, 124), f"Welcome to {member.guild.name}", color='black', font=poppins_outline, align='center')
+                (960, 54), "Welcome to", color='black', font=poppins_small_outline, align='center')
             background.text(
-                (960, 120), f"Welcome to {member.guild.name}", color='white', font=poppins, align='center')
+                (960, 50), "Welcome to", color='white', font=poppins_small, align='center')
+
+            background.text(
+                (960, 164), server_name, color='black', font=poppins_outline, align='center')
+            background.text(
+                (960, 160), server_name, color='white', font=poppins, align='center')
 
             background.text((960, 854), f"{member.name}#{member.discriminator}",
                             color='black', font=poppins_small_outline, align='center')
