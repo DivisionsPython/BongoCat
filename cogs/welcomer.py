@@ -1,11 +1,44 @@
 import discord
 import os
-from discord import ButtonStyle, Embed, TextChannel
+from discord import ButtonStyle, Embed, SelectOption
 from discord.ext import commands
 from discord.ui import Button, View
+from utils.config import PREFIX, BACKGOUNDS_DIR
 from utils.subclasses import PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
 from utils.welcomer_functions import fetch_background, update_background, delete_welcome_channel, set_welcome_channel, guild_is_known, fetch_channel, update_welcome_channel
 from easy_pil import Editor, load_image_async, Font
+
+
+class BgSelect(discord.ui.Select):
+    bg_length = len([name for name in os.listdir(
+        BACKGOUNDS_DIR) if os.path.isfile(os.path.join(BACKGOUNDS_DIR, name))])
+    options = []
+
+    for times in range(bg_length):
+        options.append(
+            SelectOption(
+                label=f'Background {times+1}', value=f'{times+1}', description='Select to show')
+        )
+
+    def __init__(self) -> None:
+        super().__init__(
+            options=self.options,
+            placeholder="Choose a background to show"
+        )
+
+    async def callback(self, interaction):
+        for times in range(self.bg_length):
+            if self.values[0] == f'{times+1}':
+                embed = ClassicEmbed()
+                embed.title = f'Background {times+1}'
+                embed.set_image(
+                    url=f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg")
+                embed.add_field(name='Is this your choice?',
+                                value=f'Run the command `{PREFIX}background {times+1}`')
+                await interaction.response.edit_message(embed=embed)
+
+    def get_bg_length(self):
+        return self.bg_length
 
 
 class Welcomer(commands.Cog):
@@ -153,27 +186,24 @@ class Welcomer(commands.Cog):
         cursor = await self.bot.connection.cursor()
 
         if await guild_is_known(cursor, ctx.guild.id):
-
-            dir = './utils/img/bg'
-            bg_length = len([name for name in os.listdir(
-                dir) if os.path.isfile(os.path.join(dir, name))])
-
             success = SuccessEmbed()
 
             if background == None:
                 current_bg = await fetch_background(cursor, ctx.guild.id)
+
                 embed = ClassicEmbed()
                 embed.title = f"Current backgound index set to {current_bg}"
                 embed.add_field(name="Do you want to change it?",
-                                value="Take a look to the list of backgrounds:")
+                                value="Take a look to the list of backgrounds")
 
-                for times in range(bg_length):
-                    url = f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg"
-                    embed.add_field(
-                        name=f"Background {times + 1}", value=f"[Click here]({url})", inline=False)
+                view = PrivateView(ctx.author)
+                selector = BgSelect()
+                view.add_item(selector)
 
-                await ctx.channel.send(embed=embed)
+                await ctx.channel.send(embed=embed, view=view)
             else:
+                selector = BgSelect()
+                bg_length = selector.get_bg_length()
                 if background > (bg_length + 1) or background == 0:
                     embed = ErrorEmbed()
                     embed.title = "\u26d4 That's not a valid background number"
