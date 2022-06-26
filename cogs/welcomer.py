@@ -61,6 +61,7 @@ class Welcomer(commands.Cog):
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
         success = SuccessEmbed()
+        warning = WarningEmbed()
         if channel == None and await guild_is_known(cursor, ctx.guild.id):
             channel_id = await fetch_channel(cursor, ctx.guild.id)
             success.title = 'Welcome message already set'
@@ -72,12 +73,12 @@ class Welcomer(commands.Cog):
         else:
             if await guild_is_known(cursor, ctx.guild.id):
                 channel_id = await fetch_channel(cursor, ctx.guild.id)
-                error.title = "\u26d4 There's a welcome channel already"
-                error.add_field(
+                warning.title = "\u26a0 There's a welcome channel already"
+                warning.add_field(
                     name="Channel", value=f'<#{str(channel_id)}>', inline=True)
-                error.add_field(
-                    name="Maybe...", value="You wanted to update it?", inline=True)
-                await ctx.channel.send(embed=error)
+                warning.add_field(
+                    name="Maybe...", value=f"You wanted to update it?\nRun the command `{PREFIX}welcome update <channel>`", inline=True)
+                await ctx.channel.send(embed=warning)
             else:
                 await set_welcome_channel(self.bot.connection, ctx.guild.id, channel.id)
                 success.title = "\u2705 Welcome channel set"
@@ -113,7 +114,7 @@ class Welcomer(commands.Cog):
             else:
                 await update_welcome_channel(self.bot.connection, ctx.guild.id, channel.id)
                 channel_id = await fetch_channel(cursor, ctx.guild.id)
-                success.title = "\u2705 Welcome channel set"
+                success.title = "\u2705 Welcome channel updated"
                 success.add_field(
                     name="Channel", value=f'<#{str(channel_id)}>')
                 await ctx.channel.send(embed=success)
