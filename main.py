@@ -6,6 +6,6 @@ from utils.subclasses import Bot
 intents = discord.Intents.all()
 
 bot = Bot(
-    command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
+    command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, case_insensitive=True)
 
 bot.run(TOKEN)

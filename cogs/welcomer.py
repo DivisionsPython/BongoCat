@@ -34,20 +34,30 @@ class BgSelect(discord.ui.Select):
                 embed.set_image(
                     url=f"https://raw.githubusercontent.com/madkarmaa/BongoCat/main/utils/img/bg/{times+1}.jpg")
                 embed.add_field(name='Is this your choice?',
-                                value=f'Run the command `{PREFIX}background {times+1}`')
+                                value=f'Run the command `{PREFIX}welcome background {times+1}` or click "**Select**"')
                 await interaction.response.edit_message(embed=embed)
 
-    def get_bg_length(self):
+    def get_bg_length(self) -> int:
         return self.bg_length
+
+    def get_selector_value(self) -> int | None:
+        return self.values[0] if self.values else None
 
 
 class Welcomer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["setwelcome", "welcomer", "welc"])
+    @commands.group()
     @commands.has_permissions(administrator=True)
-    async def welcome(self, ctx, channel: discord.TextChannel = None):
+    async def welcome(self, ctx):
+        if ctx.invoked_subcommand is None:
+            embed = ErrorEmbed()
+            embed.title = '\u26d4 What do you want to do?'
+            await ctx.channel.send(embed=embed)
+
+    @welcome.command()
+    async def set(self, ctx, channel: discord.TextChannel = None):
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
         success = SuccessEmbed()
@@ -75,9 +85,19 @@ class Welcomer(commands.Cog):
 
             await cursor.close()
 
-    @commands.command(aliases=["updatewelc", "upwelc"])
-    @commands.has_permissions(administrator=True)
-    async def updatewelcome(self, ctx, channel: discord.TextChannel = None):
+    @set.error
+    async def wrong_channel(self, ctx, error):
+        if isinstance(error, commands.ChannelNotFound):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 That's not a text channel"
+            return await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MissingPermissions):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to run this command"
+            return await ctx.channel.send(embed=embed)
+
+    @welcome.command()
+    async def update(self, ctx, channel: discord.TextChannel = None):
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
         success = SuccessEmbed()
@@ -105,7 +125,7 @@ class Welcomer(commands.Cog):
             embed.title = "\u26d4 No welcome channel is set"
             await ctx.channel.send(embed=embed)
 
-    @updatewelcome.error
+    @update.error
     async def wrong_channel2(self, ctx, error):
         if isinstance(error, commands.ChannelNotFound):
             embed = ErrorEmbed()
@@ -116,9 +136,8 @@ class Welcomer(commands.Cog):
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
-    @commands.command(aliases=["deletewelcome", "nowelcome", "delwelcome"])
-    @commands.has_permissions(administrator=True)
-    async def removewelcome(self, ctx):
+    @welcome.command()
+    async def remove(self, ctx):
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, ctx.guild.id):
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
@@ -169,36 +188,56 @@ class Welcomer(commands.Cog):
 
         await cursor.close()
 
-    @welcome.error
-    async def wrong_channel(self, ctx, error):
-        if isinstance(error, commands.ChannelNotFound):
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 That's not a text channel"
-            return await ctx.channel.send(embed=embed)
-        if isinstance(error, commands.MissingPermissions):
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 You don't have the perms to run this command"
-            return await ctx.channel.send(embed=embed)
-
-    @commands.command(aliases=["setbackground", "bg", "setbg", "newbg", "newbackground", "updatebackground", "updatebg"])
-    @commands.has_permissions(administrator=True)
+    @welcome.command(aliases=["bg"])
     async def background(self, ctx, background: int = None):
         cursor = await self.bot.connection.cursor()
 
         if await guild_is_known(cursor, ctx.guild.id):
-            success = SuccessEmbed()
-
             if background == None:
                 current_bg = await fetch_background(cursor, ctx.guild.id)
+                buttonY = Button(label='Select', style=ButtonStyle.green)
+                buttonN = Button(label='Exit', style=ButtonStyle.red)
+                selector = BgSelect()
+
+                async def set_callback(interaction):
+                    success = SuccessEmbed()
+                    error = ErrorEmbed()
+                    bg_value = selector.get_selector_value()
+                    cursor = await self.bot.connection.cursor()
+
+                    if bg_value is not None:
+                        try:
+                            await update_background(self.bot.connection, ctx.guild.id, bg_value)
+                            current_bg = await fetch_background(cursor, ctx.guild.id)
+                            success.title = f"\u2705 New background index set to {current_bg}"
+
+                            await cursor.close()
+
+                            await interaction.response.edit_message(embed=success, view=None)
+                            view.stop()
+                        except:
+                            error.title = "\u26d4 Unexpected error"
+                            await interaction.response.send_message(embed=error)
+                    else:
+                        error.title = "\u26d4 No background has been selected"
+                        await interaction.response.send_message(embed=error)
+
+                async def exit_callback(interaction):
+                    await interaction.response.edit_message(view=None)
+                    view.stop()
 
                 embed = ClassicEmbed()
                 embed.title = f"Current backgound index set to {current_bg}"
                 embed.add_field(name="Do you want to change it?",
                                 value="Take a look to the list of backgrounds")
 
-                view = PrivateView(ctx.author)
-                selector = BgSelect()
+                buttonN.callback = exit_callback
+                buttonY.callback = set_callback
+
+                view = PrivateView(ctx.author, timeout=180)
                 view.add_item(selector)
+                view.add_item(buttonY)
+                view.add_item(buttonN)
 
                 await ctx.channel.send(embed=embed, view=view)
             else:
@@ -208,17 +247,6 @@ class Welcomer(commands.Cog):
                     embed = ErrorEmbed()
                     embed.title = "\u26d4 That's not a valid background number"
                     await ctx.channel.send(embed=embed)
-                else:
-                    try:
-                        await update_background(self.bot.connection, ctx.guild.id, background)
-                        current_bg = await fetch_background(cursor, ctx.guild.id)
-
-                        success.title = f"\u2705 New background index set to {current_bg}"
-                        await ctx.channel.send(embed=success)
-                    except:
-                        embed = ErrorEmbed()
-                        embed.title = "\u26d4 Unexpected error"
-                        await ctx.channel.send(embed=embed)
 
         else:
             embed = ErrorEmbed()
