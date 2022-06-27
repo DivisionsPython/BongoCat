@@ -28,27 +28,104 @@ class General(commands.Cog):
         embed.title = f"Click the button below to invite me to your server! \U0001f389"
         await ctx.channel.send(embed=embed, view=view)
 
-    @commands.command(aliases=["av", "pfp"])
-    async def avatar(self, ctx, member: discord.Member = None):
+    @commands.command(aliases=["whois"])
+    async def userinfo(self, ctx, member: discord.Member = None):
         if member == None:
             member = ctx.author
 
-        user = await self.bot.fetch_user(member.id)
+        user = ctx.guild.get_member(member.id)
+
+        try:
+            bannerUser = await self.bot.fetch_user(member.id)
+            banner = str(bannerUser.banner.url)
+        except:
+            banner = None
 
         view = View()
+        button3 = Button(
+            label='User URL', url=f'https://discord.com/users/{user.id}', style=ButtonStyle.url)
+        view.add_item(button3)
+
         button1 = Button(
             label='Download avatar', url=str(user.avatar.url), style=ButtonStyle.url)
         view.add_item(button1)
-        try:
+
+        if user.display_avatar.url == user.avatar.url:
+            pass
+        else:
+            button4 = Button(
+                label='Download server avatar', url=f'{user.display_avatar.url}', style=ButtonStyle.url)
+            view.add_item(button4)
+
+        if banner is not None:
             button2 = Button(
-                label='Download banner', url=str(user.banner.url), style=ButtonStyle.url)
+                label='Download banner', url=banner, style=ButtonStyle.url)
             view.add_item(button2)
-        except:
+        else:
             pass
 
+        created = user.created_at
+        created = datetime.datetime.strftime(created, "%A, %d %B %Y\n%I:%M %p")
+
+        joined = user.joined_at
+        joined = datetime.datetime.strftime(joined, "%A, %d %B %Y\n%I:%M %p")
+
         embed = ClassicDetailedEmbed(user=ctx.author)
-        embed.title = f"{member.name}'s avatar"
-        embed.set_image(url=str(member.avatar.url))
+        embed.title = f"{user.name}'s user info"
+        embed.set_thumbnail(url=str(user.avatar.url))
+
+        embed.add_field(name="Username", value=user.name, inline=True)
+        embed.add_field(name="Discriminator",
+                        value=f'#{user.discriminator}', inline=True)
+        embed.add_field(name="Bot?", value=user.bot)
+        embed.add_field(name="User ID", value=user.id, inline=False)
+        embed.add_field(name="Account created",
+                        value=created, inline=True)
+        embed.add_field(name="Joined the server", value=joined, inline=True)
+
+        if user.display_name == user.name:
+            pass
+        else:
+            embed.add_field(name="Server nickname",
+                            value=user.display_name, inline=True)
+
+        perms = []
+        separated_perms = []
+
+        for name, value in user.guild_permissions:
+            if value:
+                perms.append(name)
+            else:
+                continue
+
+        if user.id == ctx.guild.owner_id:
+            separated_perms = ["Server owner"]
+        else:
+            for perm in perms:
+                separated = perm.split("_")
+                reunited_lowercase = " ".join(separated)
+                reunited = reunited_lowercase.capitalize()
+                separated_perms.append(reunited)
+
+        chars = [x for x in separated_perms]
+
+        if len(chars) > 1024:
+            separated_perms = ["Too many to display"]
+
+        embed.add_field(name="Permissions", value=", ".join(
+            separated_perms), inline=False)
+
+        roles = [role.mention for role in user.roles[1:]]
+        roles.append('@everyone')
+
+        roles_value = " | ".join(roles)
+        chars = [x for x in roles_value]
+
+        if len(chars) > 1024:
+            roles_value = ["Too many to display"]
+
+        embed.add_field(name="Roles", value=roles_value, inline=False)
+
         await ctx.channel.send(embed=embed, view=view)
 
     @commands.command(aliases=["listening"])
