@@ -251,9 +251,90 @@ class Economy(commands.Cog):
     async def beg_timeout(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             embed = WarningEmbed()
-            embed.title = "\u26d4 Cooldown"
+            embed.title = "\u26a0 Cooldown"
             embed.add_field(name='Come on bro, chill',
                             value=f"You've already begged recently. Try again in **{round(error.retry_after)}s**")
+            await ctx.channel.send(embed=embed)
+
+    @commands.command(aliases=["rob"], cooldown_after_parsing=True)
+    @commands.cooldown(1, 90, commands.BucketType.user)
+    async def bankrob(self, ctx, member: discord.Member):
+        error = ErrorEmbed()
+        success = SuccessEmbed()
+        cursor = await self.bot.connection.cursor()
+
+        if await user_is_known(cursor, ctx.author.id):
+            if await user_is_known(cursor, member.id):
+                ctxWallet = await fetch_wallet(cursor, ctx.author.id)
+                memberBank = await fetch_bank(cursor, member.id)
+                memberWallet = await fetch_wallet(cursor, member.id)
+                if memberBank < 500:
+                    error.title = f"\u26d4 {member.name} doesn't have enough money in their bank"
+                    error.add_field(
+                        name="Details", value=f'The minimum coins required are **500$**, and {member.name} only has **{memberBank}$** in their bank.')
+                    ctx.command.reset_cooldown(ctx)
+                    await ctx.channel.send(embed=error)
+                elif ctxWallet < 500:
+                    error.title = "\u26d4 You don't have enough money in your wallet"
+                    error.add_field(
+                        name="Details", value=f'The minimum coins required are **500$**, and you only have **{ctxWallet}$** in your wallet.')
+                    ctx.command.reset_cooldown(ctx)
+                    await ctx.channel.send(embed=error)
+                else:
+                    if random.random() < 30/100:  # chance of the rob to be successful
+                        if memberBank < 2000:  # if the robbed user bank has less than 2000 coins
+                            amount = random.randrange(1, (memberBank+1))
+                        else:  # else if the robbed user bank has more than 2000 coins
+                            if random.random() < 8/100:  # chance of the rob to give more than 2000 coins
+                                amount = random.randrange(2000, (memberBank+1))
+                            else:  # else less than 2000 coins
+                                maxCoins = random.randrange(memberBank, 2000)
+                                amount = random.randrange(1, maxCoins)
+
+                        await update_wallet(self.bot.connection, ctx.author.id, ctxWallet+amount)
+                        await update_bank(self.bot.connection, member.id, memberBank-amount)
+
+                        if amount >= 2000:
+                            success.title = '\U0001f4b8 The robbery was successful and you got very lucky!'
+                            success.add_field(
+                                name="You got:", value=f'{amount}$')
+                            await ctx.channel.send(embed=success)
+                        else:
+                            success.title = '\U0001f4b8 The robbery was successful!'
+                            success.add_field(
+                                name="You got:", value=f'{amount}$')
+                            await ctx.channel.send(embed=success)
+
+                    else:
+                        amount = random.randrange(1, 501)
+                        await update_wallet(self.bot.connection, member.id, memberWallet+amount)
+                        await update_wallet(self.bot.connection, ctx.author.id, ctxWallet-amount)
+                        await ctx.channel.send(f"Unfortunately, you got caugth by {member.mention} and had to pay **{amount}$**")
+
+            else:
+                error.title = "\u26d4 This user hasn't an account yet"
+                ctx.command.reset_cooldown(ctx)
+                await ctx.channel.send(embed=error)
+
+        else:
+            error.title = "\u26d4 You don't have an account!"
+            error.add_field(name='Create a new account today! \U0001f389',
+                            value=f'Use the command **`{PREFIX}newaccount`** and start having fun with our economy system :)')
+            await ctx.channel.send(embed=error)
+
+        await cursor.close()
+
+    @bankrob.error
+    async def rob_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            embed = WarningEmbed()
+            embed.title = "\u26a0 Cooldown"
+            embed.add_field(name='Come on bro, chill',
+                            value=f"You've already robbed recently. Try again in **{round(error.retry_after)}s**")
+            await ctx.channel.send(embed=embed)
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 Who do you want to rob?"
             await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
