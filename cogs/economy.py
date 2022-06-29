@@ -222,7 +222,7 @@ class Economy(commands.Cog):
     @commands.command(description="Really? Don't you have enough money? Imagine begging \U0001f602 You have a chance of getting free coins from someone.")
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def beg(self, ctx):
-        '''Have a chance of getting free coins'''
+        '''Have a chance of getting free coins.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             if random.random() < 42/100:  # chance of the beg to be successful
@@ -265,7 +265,7 @@ class Economy(commands.Cog):
     @commands.command(aliases=["rob"], cooldown_after_parsing=True, description="Oh so you're a real criminal \U0001f977 Try to get some money from someone's bank. Pay attention to don't get caught \U0001f693")
     @commands.cooldown(1, 90, commands.BucketType.user)
     async def bankrob(self, ctx, member: discord.Member):
-        """Try stealing coins from someone's bank"""
+        """Try stealing coins from someone's bank."""
         error = ErrorEmbed()
         success = SuccessEmbed()
         cursor = await self.bot.connection.cursor()

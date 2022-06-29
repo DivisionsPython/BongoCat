@@ -48,10 +48,10 @@ class Welcomer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(description="Welcome commands group.")
+    @commands.group(description=f"Welcome commands group.")
     @commands.has_permissions(administrator=True)
     async def welcome(self, ctx):
-        '''Welcome commands group.'''
+        '''Welcome commands group. Use `help welcome` for more details.'''
         if ctx.invoked_subcommand is None:
             embed = ErrorEmbed()
             embed.title = '\u26d4 What do you want to do?'

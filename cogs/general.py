@@ -20,7 +20,7 @@ class General(commands.Cog):
 
     @commands.command(description="Invite the bot to your discord server.")
     async def invite(self, ctx):
-        '''Invite the bot to your discord server.'''
+        '''Invite the bot to your Discord server.'''
         button = Button(
             label='Invite', url=f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot", style=ButtonStyle.url)
         view = View()
