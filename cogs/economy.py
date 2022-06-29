@@ -21,8 +21,9 @@ class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["addaccount", "createaccount"])
+    @commands.command(aliases=["addaccount", "createaccount"], description='Create a new account for our economy system and start playing :)')
     async def newaccount(self, ctx):
+        '''Create a new economy account.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             embed = ErrorEmbed()
@@ -39,8 +40,9 @@ class Economy(commands.Cog):
 
         await cursor.close()
 
-    @commands.command()
+    @commands.command(description="Delete your economy system account. It's sad to see you go :(")
     async def delaccount(self, ctx):
+        '''Delete your economy account.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
@@ -91,8 +93,9 @@ class Economy(commands.Cog):
 
         await cursor.close()
 
-    @commands.command(aliases=["dep"])
+    @commands.command(aliases=["dep"], description="Deposit coins from your wallet to your bank.")
     async def deposit(self, ctx, amount: int = None):
+        '''Deposit coins from your wallet to your bank.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
@@ -134,8 +137,9 @@ class Economy(commands.Cog):
 
         await cursor.close()
 
-    @commands.command(aliases=["with"])
+    @commands.command(aliases=["with"], description="Withdraw coins from your bank to your wallet.")
     async def withdraw(self, ctx, amount: int = None):
+        '''Withdraw coins from your bank to your wallet.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             wallet = await fetch_wallet(cursor, ctx.author.id)
@@ -177,8 +181,9 @@ class Economy(commands.Cog):
 
         await cursor.close()
 
-    @commands.command(aliases=["bal"])
+    @commands.command(aliases=["bal"], description="Check your (or a user's) balance.")
     async def balance(self, ctx, member: discord.Member = None):
+        '''Check your (or a user's) balance.'''
         if not member:
             member = ctx.author
 
@@ -214,9 +219,10 @@ class Economy(commands.Cog):
 
         await cursor.close()
 
-    @commands.command()
+    @commands.command(description="Really? Don't you have enough money? Imagine begging \U0001f602 You have a chance of getting free coins from someone.")
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def beg(self, ctx):
+        '''Have a chance of getting free coins'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
             if random.random() < 42/100:  # chance of the beg to be successful
@@ -256,9 +262,10 @@ class Economy(commands.Cog):
                             value=f"You've already begged recently. Try again in **{round(error.retry_after)}s**")
             await ctx.channel.send(embed=embed)
 
-    @commands.command(aliases=["rob"], cooldown_after_parsing=True)
+    @commands.command(aliases=["rob"], cooldown_after_parsing=True, description="Oh so you're a real criminal \U0001f977 Try to get some money from someone's bank. Pay attention to don't get caught \U0001f693")
     @commands.cooldown(1, 90, commands.BucketType.user)
     async def bankrob(self, ctx, member: discord.Member):
+        """Try stealing coins from someone's bank"""
         error = ErrorEmbed()
         success = SuccessEmbed()
         cursor = await self.bot.connection.cursor()

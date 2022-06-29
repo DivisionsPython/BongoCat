@@ -9,8 +9,9 @@ class Gifs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(description="Kiss a user.")
     async def kiss(self, ctx, member: discord.Member):
+        '''Kiss a user.'''
         search_term = "anime kiss"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -51,8 +52,9 @@ class Gifs(commands.Cog):
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(description="Slap a user.")
     async def slap(self, ctx, member: discord.Member):
+        '''Slap a user.'''
         search_term = "anime slap"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -93,8 +95,9 @@ class Gifs(commands.Cog):
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(description="Punch a user.")
     async def punch(self, ctx, member: discord.Member):
+        '''Punch a user.'''
         search_term = "anime punch"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -135,8 +138,9 @@ class Gifs(commands.Cog):
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(description="Hug a user.")
     async def hug(self, ctx, member: discord.Member):
+        '''Hug a user.'''
         search_term = "anime hug"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -177,8 +181,9 @@ class Gifs(commands.Cog):
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(description="Cuddle a user.")
     async def cuddle(self, ctx, member: discord.Member):
+        '''Cuddle a user.'''
         search_term = "anime cuddle"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -219,8 +224,9 @@ class Gifs(commands.Cog):
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
-    @commands.command(aliases=["headpat"])
-    async def pat(self, ctx, member: discord.Member):
+    @commands.command(aliases=["pat"], description="Headpat a user.")
+    async def headpat(self, ctx, member: discord.Member):
+        '''Headpat a user'''
         search_term = "anime headpat"
         apikey = "DZ2JR8TMALJU"
         lmt = 50
@@ -250,8 +256,8 @@ class Gifs(commands.Cog):
             embed.set_image(url=random.choice(gif_list))
             await ctx.channel.send(embed=embed)
 
-    @pat.error
-    async def pat_error(self, ctx, error):
+    @headpat.error
+    async def headpat_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = ErrorEmbed()
             embed.title = "Who you wanna headpat?"

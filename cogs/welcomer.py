@@ -48,16 +48,18 @@ class Welcomer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @commands.group(description="Welcome commands group.")
     @commands.has_permissions(administrator=True)
     async def welcome(self, ctx):
+        '''Welcome commands group.'''
         if ctx.invoked_subcommand is None:
             embed = ErrorEmbed()
             embed.title = '\u26d4 What do you want to do?'
             await ctx.channel.send(embed=embed)
 
-    @welcome.command()
+    @welcome.command(description="Select a channel where to send the welcome message.")
     async def set(self, ctx, channel: discord.TextChannel = None):
+        '''Set the welcome channel.'''
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
         success = SuccessEmbed()
@@ -97,8 +99,9 @@ class Welcomer(commands.Cog):
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
-    @welcome.command()
+    @welcome.command(description="Update the channel where to send the welcome message.")
     async def update(self, ctx, channel: discord.TextChannel = None):
+        '''Update the welcome channel.'''
         cursor = await self.bot.connection.cursor()
         error = ErrorEmbed()
         success = SuccessEmbed()
@@ -137,8 +140,9 @@ class Welcomer(commands.Cog):
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
-    @welcome.command()
+    @welcome.command(description="Remove the channel where to send the welcome message. No welcome message will be shown.")
     async def remove(self, ctx):
+        '''Remove the welcome channel.'''
         cursor = await self.bot.connection.cursor()
         if await guild_is_known(cursor, ctx.guild.id):
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
@@ -189,8 +193,9 @@ class Welcomer(commands.Cog):
 
         await cursor.close()
 
-    @welcome.command(aliases=["bg"])
+    @welcome.command(aliases=["bg"], description="Update the background for the welcome message. Select from the options.")
     async def background(self, ctx, background: int = None):
+        '''Update the background for the welcome message.'''
         cursor = await self.bot.connection.cursor()
 
         if await guild_is_known(cursor, ctx.guild.id):

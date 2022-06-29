@@ -11,14 +11,16 @@ class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["latency"])
+    @commands.command(aliases=["latency"], description="Check the bot's latency.")
     async def ping(self, ctx):
+        '''Check the bot's latency.'''
         embed = ClassicDetailedEmbed(user=ctx.author)
         embed.title = f'\U0001f4e1 My latency is **{round(self.bot.latency * 1000)}ms**'
         await ctx.channel.send(embed=embed)
 
-    @commands.command()
+    @commands.command(description="Invite the bot to your discord server.")
     async def invite(self, ctx):
+        '''Invite the bot to your discord server.'''
         button = Button(
             label='Invite', url=f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot", style=ButtonStyle.url)
         view = View()
@@ -28,8 +30,9 @@ class General(commands.Cog):
         embed.title = f"Click the button below to invite me to your server! \U0001f389"
         await ctx.channel.send(embed=embed, view=view)
 
-    @commands.command(aliases=["whois"])
+    @commands.command(aliases=["whois"], description="Check a user's profile details. Also download their avatar and banner ;)")
     async def userinfo(self, ctx, member: discord.Member = None):
+        '''Check a user's profile details.'''
         if member == None:
             member = ctx.author
 
@@ -128,8 +131,9 @@ class General(commands.Cog):
 
         await ctx.channel.send(embed=embed, view=view)
 
-    @commands.command(aliases=["listening"])
+    @commands.command(aliases=["listening"], description="Check a user's Spotify listening activity. This command only checks for the user's Discord activity, this means it won't work if the activity is not displayed.")
     async def spotify(self, ctx, member: discord.Member = None):
+        '''Check a user's Spotify listening activity.'''
         if member == None:
             member = ctx.author
 

@@ -78,7 +78,7 @@ class MyHelpCommand(commands.MinimalHelpCommand):
             for command in filtered:
                 embed.add_field(
                     name=self.get_command_signature(command),
-                    value=command.short_doc or "No short description",
+                    value=command.help or "No short description",
                     inline=False
                 )
         elif mapping:

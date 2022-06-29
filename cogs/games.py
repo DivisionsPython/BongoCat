@@ -12,6 +12,7 @@ class Games(commands.Cog):
 
     @commands.command(description="Do your best to guess the word! Send a letter in the chat, and hope it's correct.")
     async def hangman(self, ctx):
+        '''Play the famous game "Hangman".'''
 
         def getWord() -> str:
             url = "https://raw.githubusercontent.com/meetDeveloper/freeDictionaryAPI/master/meta/wordList/english.txt"
