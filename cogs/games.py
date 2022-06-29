@@ -10,7 +10,7 @@ class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(description="Do your best to guess the word! Send a letter in the chat, and hope it's correct.")
     async def hangman(self, ctx):
 
         def getWord() -> str:
