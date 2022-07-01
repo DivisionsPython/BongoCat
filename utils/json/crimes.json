@@ -1,0 +1,19 @@
+[
+    {"name": "Shoplifting"},
+    {"name": "Stealing a bicycle"},
+    {"name": "Stealing from lockers"},
+    {"name": "Graffiti"},
+    {"name": "Damaging a mailbox"},
+    {"name": "Committing fraud"},
+    {"name": "Tax evasion"},
+    {"name": "Theft"},
+    {"name": "Robbery"},
+    {"name": "Drug dealing"},
+    {"name": "Cyberbullying"},
+    {"name": "Assault"},
+    {"name": "Traffic violation"},
+    {"name": "Murder"},
+    {"name": "Corruption"},
+    {"name": "Extortion"},
+    {"name": "Piracy"}
+]

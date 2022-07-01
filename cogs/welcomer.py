@@ -159,7 +159,6 @@ class Welcomer(commands.Cog):
 
                 embed = SuccessEmbed()
                 embed.title = f"\u2705 Welcome message removed"
-                await embedToEdit.edit(embed=embed)
 
                 await interaction.response.edit_message(embed=embed, view=None)
 
@@ -168,7 +167,6 @@ class Welcomer(commands.Cog):
             async def den_callback(interaction):
                 embed = SuccessEmbed()
                 embed.title = f"\u2705 Event cancelled"
-                await embedToEdit.edit(embed=embed)
 
                 await interaction.response.edit_message(embed=embed, view=None)
 

@@ -31,6 +31,10 @@ class Errors(commands.Cog):
             embed = ErrorEmbed()
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
+        elif isinstance(error, commands.NotOwner):
+            embed = ErrorEmbed()
+            embed.title = f'\u26d4 {error}'
+            return await ctx.channel.send(embed=embed)
 
         else:
             exception_list = traceback.format_exception(

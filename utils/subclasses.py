@@ -43,10 +43,16 @@ class Bot(commands.Bot):
             self.connection = await aiosqlite.connect('.\databases\database.sqlite')
             cursor = await self.connection.cursor()
             await cursor.execute('''CREATE TABLE IF NOT EXISTS eco (
-                user_id INTERGER, wallet INTERGER, bank INTERGER
+                user_id INTEGER, wallet INTEGER, bank INTEGER
                 )''')
             await cursor.execute('''CREATE TABLE IF NOT EXISTS welcomer (
-                guild_id INTERGER, channel_id INTERGER, background INTERGER
+                guild_id INTEGER, channel_id INTEGER, background INTEGER
+                )''')
+            await cursor.execute('''CREATE TABLE IF NOT EXISTS animals (
+                user_id INTEGER, butterfly INTEGER, snail INTEGER, chipmunk INTEGER, whale INTEGER, elephant INTEGER, scorpion INTEGER, deer INTEGER, fox INTEGER, owl INTEGER, squid INTEGER, eagle INTEGER, frog INTEGER, gorilla INTEGER, wolf INTEGER, hedgehog INTEGER
+                )''')
+            await cursor.execute('''CREATE TABLE IF NOT EXISTS tools (
+                user_id INTEGER, rifle INTEGER, rod INTEGER, pick INTEGER
                 )''')
             await self.connection.commit()
             await cursor.close()

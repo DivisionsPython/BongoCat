@@ -1,4 +1,4 @@
-from utils.config import PREFIX
+from utils.config import PREFIX, CRIMES_DIR
 import discord
 from discord import ButtonStyle
 from discord.ext import commands
@@ -7,6 +7,7 @@ from utils.subclasses import PrivateView, ClassicEmbed, ClassicDetailedEmbed, Su
 import random
 import requests
 import json
+import os
 from utils.economy_functions import add_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank, user_is_known
 
 
@@ -45,8 +46,8 @@ class Economy(commands.Cog):
         '''Delete your economy account.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
-            buttonY = Button(label='Confirm', style=ButtonStyle.green)
-            buttonN = Button(label='Cancel', style=ButtonStyle.red)
+            button1 = Button(label='Confirm', style=ButtonStyle.green)
+            button2 = Button(label='Cancel', style=ButtonStyle.red)
             view = PrivateView(ctx.author)
 
             async def view_timeout():
@@ -54,35 +55,29 @@ class Economy(commands.Cog):
                 embed.title = "\u26d4 Time's up. No decision has been taken."
                 await embedToEdit.edit(embed=embed, view=None)
 
-            async def conf_callback(interaction):
-                await delete_user(self.bot.connection, ctx.author.id)
-
-                embed = SuccessEmbed()
-                embed.title = f"\u2705 {ctx.author.name}'s account deleted"
-                await embedToEdit.edit(embed=embed)
+            async def callback1(interaction):
+                embed = ClassicEmbed()
+                embed.title = "Title"
 
                 await interaction.response.edit_message(embed=embed, view=None)
 
                 view.stop()
 
-            async def den_callback(interaction):
-                embed = SuccessEmbed()
-                embed.title = f"\u2705 Event cancelled"
-                await embedToEdit.edit(embed=embed)
+            async def callback2(interaction):
+                embed = ClassicEmbed()
+                embed.title = "Title"
 
                 await interaction.response.edit_message(embed=embed, view=None)
 
                 view.stop()
 
-            buttonN.callback = den_callback
-            buttonY.callback = conf_callback
-            view.add_item(buttonY)
-            view.add_item(buttonN)
+            button1.callback = callback1
+            button2.callback = callback2
+            view.add_item(button1)
+            view.add_item(button2)
 
             embed = WarningEmbed()
-            embed.title = "\u26a0 Do you really want to delete your account?"
-            embed.add_field(name="You still have time!",
-                            value="You have **60** seconds to confirm/cancel.")
+            embed.title = "Title"
             embedToEdit = await ctx.channel.send(embed=embed, view=view)
 
             view.on_timeout = view_timeout
@@ -277,19 +272,18 @@ class Economy(commands.Cog):
         else:
             if await user_is_known(cursor, ctx.author.id):
                 if await user_is_known(cursor, member.id):
-                    ctxWallet = await fetch_wallet(cursor, ctx.author.id)
+                    ctxBank = await fetch_bank(cursor, ctx.author.id)
                     memberBank = await fetch_bank(cursor, member.id)
-                    memberWallet = await fetch_wallet(cursor, member.id)
                     if memberBank < 500:
                         error.title = f"\u26d4 {member.name} doesn't have enough money in their bank"
                         error.add_field(
                             name="Details", value=f'The minimum coins required are **500$**, and {member.name} only has **{memberBank}$** in their bank.')
                         ctx.command.reset_cooldown(ctx)
                         await ctx.channel.send(embed=error)
-                    elif ctxWallet < 500:
-                        error.title = "\u26d4 You don't have enough money in your wallet"
+                    elif ctxBank < 500:
+                        error.title = "\u26d4 You don't have enough money in your bank"
                         error.add_field(
-                            name="Details", value=f'The minimum coins required are **500$**, and you only have **{ctxWallet}$** in your wallet.')
+                            name="Details", value=f'The minimum coins required are **500$**, and you only have **{ctxBank}$** in your bank.')
                         ctx.command.reset_cooldown(ctx)
                         await ctx.channel.send(embed=error)
                     else:
@@ -305,7 +299,7 @@ class Economy(commands.Cog):
                                         memberBank, 2000)
                                     amount = random.randrange(1, maxCoins)
 
-                            await update_wallet(self.bot.connection, ctx.author.id, ctxWallet+amount)
+                            await update_bank(self.bot.connection, ctx.author.id, ctxBank+amount)
                             await update_bank(self.bot.connection, member.id, memberBank-amount)
 
                             if amount >= 2000:
@@ -321,9 +315,9 @@ class Economy(commands.Cog):
 
                         else:
                             amount = random.randrange(1, 501)
-                            await update_wallet(self.bot.connection, member.id, memberWallet+amount)
-                            await update_wallet(self.bot.connection, ctx.author.id, ctxWallet-amount)
-                            await ctx.channel.send(f"Unfortunately, you got caugth by {member.mention} and had to pay **{amount}$**")
+                            await update_bank(self.bot.connection, member.id, memberBank+amount)
+                            await update_bank(self.bot.connection, ctx.author.id, ctxBank-amount)
+                            await ctx.channel.send(f"Unfortunately, you got caugth by the police \U0001f693 and had to pay **{amount}$** to {member.mention}")
 
                 else:
                     error.title = "\u26d4 This user hasn't an account yet"
