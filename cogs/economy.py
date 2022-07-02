@@ -46,38 +46,43 @@ class Economy(commands.Cog):
         '''Delete your economy account.'''
         cursor = await self.bot.connection.cursor()
         if await user_is_known(cursor, ctx.author.id):
-            button1 = Button(label='Confirm', style=ButtonStyle.green)
-            button2 = Button(label='Cancel', style=ButtonStyle.red)
+            buttonY = Button(label='Confirm', style=ButtonStyle.green)
+            buttonN = Button(label='Cancel', style=ButtonStyle.red)
             view = PrivateView(ctx.author)
 
             async def view_timeout():
                 embed = ErrorEmbed()
                 embed.title = "\u26d4 Time's up. No decision has been taken."
+                embed.color = 0xff0000
                 await embedToEdit.edit(embed=embed, view=None)
 
-            async def callback1(interaction):
-                embed = ClassicEmbed()
-                embed.title = "Title"
+            async def conf_callback(interaction):
+                await delete_user(self.bot.connection, ctx.author.id)
+
+                embed = SuccessEmbed()
+                embed.title = f"\u2705 {ctx.author.name}'s account deleted"
 
                 await interaction.response.edit_message(embed=embed, view=None)
 
                 view.stop()
 
-            async def callback2(interaction):
-                embed = ClassicEmbed()
-                embed.title = "Title"
+            async def den_callback(interaction):
+                embed = SuccessEmbed()
+                embed.title = f"\u2705 Event cancelled"
 
                 await interaction.response.edit_message(embed=embed, view=None)
 
                 view.stop()
 
-            button1.callback = callback1
-            button2.callback = callback2
-            view.add_item(button1)
-            view.add_item(button2)
+            buttonN.callback = den_callback
+            buttonY.callback = conf_callback
+            view.add_item(buttonY)
+            view.add_item(buttonN)
 
             embed = WarningEmbed()
-            embed.title = "Title"
+            embed.title = "\u26a0 Do you really want to delete your account?"
+            embed.add_field(name="You still have time!",
+                            value="You have **60** seconds to confirm/cancel.")
             embedToEdit = await ctx.channel.send(embed=embed, view=view)
 
             view.on_timeout = view_timeout
