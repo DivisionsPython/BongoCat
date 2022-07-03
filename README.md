@@ -21,7 +21,7 @@ and much more.
 
 ## 🔗 Documentation
 
-[**Future docs website, needs to be developed**](#)
+[**madkarmaa.github.io/bongocat**](https://madkarmaa.github.io/bongocat/)
 
 ## ⚙️ Windows OS Installation
 
