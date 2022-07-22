@@ -26,27 +26,40 @@ and much more.
 ## ⚙️ Windows OS Installation
 
 1. Download and install [**Git**](https://git-scm.com/download/)
-2. Install [**discord.py 2.0**](https://github.com/Rapptz/discord.py) using **Git**:
 
-```
-python -m pip install -U git+https://github.com/Rapptz/discord.py
-```
+_All the next steps are executed in the `Command Prompt`_
 
-3. Run this command in the console:
+2. Clone the repository
 
 ```
 git clone https://github.com/madkarmaa/BongoCat.git
 ```
 
-4. Install the bot dependencies using `pip`:
+3. Setup and run an `enviroment`
 
 ```
 cd BongoCat
 ```
 
 ```
+python -m venv env
+```
+
+```
+env\Scripts\activate.bat
+```
+
+4. Install [**discord.py 2.0**](https://github.com/Rapptz/discord.py)
+
+```
+python -m pip install -U git+https://github.com/Rapptz/discord.py
+```
+
+5. Install the bot dependencies using `pip`
+
+```
 pip install -r requirements.txt
 ```
 
-5. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**config**](./utils/config.py) file
-6. Run [**main.py**](main.py)
+6. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**config**](./utils/config.py) file
+7. Run [**main.py**](main.py)
