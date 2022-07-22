@@ -20,9 +20,7 @@ class Errors(commands.Cog):
         error = getattr(error, 'original', error)
 
         if isinstance(error, commands.CommandNotFound):
-            embed = ErrorEmbed()
-            embed.title = f'\u26d4 {error}'
-            return await ctx.channel.send(embed=embed)
+            pass
 
         elif isinstance(error, commands.MemberNotFound):
             embed = ErrorEmbed()
@@ -47,7 +45,7 @@ class Errors(commands.Cog):
 
             return await ctx.channel.send(embed=error.errorEmbed, view=view)
 
-        else:
+        else:  # if unhandled error, create a report message
             user = ctx.author
 
             view = PrivateView(user=user).add_item(
