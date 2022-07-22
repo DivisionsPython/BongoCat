@@ -1,6 +1,6 @@
+import discord
 from discord.ext import commands
-import traceback
-from utils.subclasses import ErrorEmbed, ErrorReportEmbed
+from utils.subclasses import ReportButton, CustomException, ErrorEmbed, PrivateView
 
 
 class Errors(commands.Cog):
@@ -8,7 +8,7 @@ class Errors(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error):
         if hasattr(ctx.command, 'on_error'):
             return
 
@@ -23,28 +23,37 @@ class Errors(commands.Cog):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
+
         elif isinstance(error, commands.MemberNotFound):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
+
         elif isinstance(error, commands.MissingPermissions):
             embed = ErrorEmbed()
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
+
         elif isinstance(error, commands.NotOwner):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
+        elif isinstance(error, CustomException):
+            user = ctx.author
+
+            view = PrivateView(user=user).add_item(
+                ReportButton(user=user, ctx=ctx, error=error))
+
+            return await ctx.channel.send(embed=error.errorEmbed, view=view)
+
         else:
-            exception_list = traceback.format_exception(
-                type(error), error, error.__traceback__)
-            await ctx.channel.send(f'''
-Exception in command **`{ctx.command}`**:
-```
-{"".join(exception_list)}
-```
-''')
+            user = ctx.author
+
+            view = PrivateView(user=user).add_item(
+                ReportButton(user=user, ctx=ctx, error=error))
+
+            return await ctx.channel.send(embed=ErrorEmbed(title=f'\u26d4 Unexpected error'), view=view)
 
 
 async def setup(bot):

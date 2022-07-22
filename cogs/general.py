@@ -169,6 +169,23 @@ class General(commands.Cog):
                             value=f"{member.name} might not be listening to Spotify, or maybe the activity is not displayed.")
             await ctx.channel.send(embed=embed)
 
+    @commands.command()
+    async def emoji(self, ctx, emoji: discord.PartialEmoji):
+        embed = ClassicDetailedEmbed(user=ctx.author)
+
+        button = Button(
+            label='Download', url=str(emoji.url), style=ButtonStyle.url)
+        view = View()
+        view.add_item(button)
+
+        embed.title = "Emoji info"
+        embed.set_thumbnail(url=str(emoji.url))
+        embed.add_field(name="Name", value=emoji.name, inline=True)
+        embed.add_field(name="ID", value=emoji.id, inline=True)
+        embed.add_field(name="Animated?", value=emoji.animated, inline=True)
+
+        await ctx.channel.send(embed=embed, view=view)
+
 
 async def setup(bot):
     await bot.add_cog(General(bot))

@@ -1,11 +1,13 @@
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
+from discord import Interaction, ButtonStyle, Emoji, PartialEmoji
 import colorama
 from colorama import Fore
 import os
 import aiosqlite
 import datetime
+import traceback
 
 
 class Bot(commands.Bot):
@@ -48,32 +50,12 @@ class Bot(commands.Bot):
             await cursor.execute('''CREATE TABLE IF NOT EXISTS welcomer (
                 guild_id INTEGER, channel_id INTEGER, background INTEGER
                 )''')
-            await cursor.execute('''CREATE TABLE IF NOT EXISTS animals (
-                user_id INTEGER, butterfly INTEGER, snail INTEGER, chipmunk INTEGER, whale INTEGER, elephant INTEGER, scorpion INTEGER, deer INTEGER, fox INTEGER, owl INTEGER, squid INTEGER, eagle INTEGER, frog INTEGER, gorilla INTEGER, wolf INTEGER, hedgehog INTEGER
-                )''')
-            await cursor.execute('''CREATE TABLE IF NOT EXISTS tools (
-                user_id INTEGER, rifle INTEGER, rod INTEGER, pick INTEGER
-                )''')
             await self.connection.commit()
             await cursor.close()
         except:
             print(Fore.RED + 'Error loading database' + Fore.RESET)
         else:
             print(Fore.GREEN + 'Database loaded' + Fore.RESET)
-
-
-class PrivateView(discord.ui.View):
-    def __init__(self, user: discord.User, *, timeout: int = 60):
-        super().__init__(timeout=timeout)
-        self.user = user
-
-    async def interaction_check(self, interaction: discord.Interaction):
-        return interaction.user and interaction.user.id == self.user.id
-
-
-class ClassicEmbed(discord.Embed):
-    def __init__(self, *, colour=0xdda7ff):
-        super().__init__(colour=colour)
 
 
 class ClassicDetailedEmbed(discord.Embed):
@@ -89,29 +71,86 @@ class ClassicDetailedEmbed(discord.Embed):
         return super().set_footer(text=f"Requested by {self.user.name}", icon_url=str(self.user.avatar.url))
 
 
+class ClassicEmbed(discord.Embed):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xdda7ff))
+
+
 class SuccessEmbed(discord.Embed):
-    def __init__(self, *, colour=0x00e600):
-        super().__init__(colour=colour)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0x00e600))
 
 
 class WarningEmbed(discord.Embed):
-    def __init__(self, *, colour=0xeed202):
-        super().__init__(colour=colour)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xeed202))
 
 
 class ErrorEmbed(discord.Embed):
-    def __init__(self, *, colour=0xff0000):
-        super().__init__(colour=colour)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xff0000))
 
 
-class ErrorReportEmbed(discord.Embed):
-    def __init__(self, user: discord.User, *, colour=0xff0000, timestamp=None):
-        if timestamp == None:
-            timestamp = datetime.datetime.now()
+class CustomException(Exception):
+    def __init__(self, errMsg: str | None = "Raised a custom exception") -> None:
+        super().__init__(errMsg)
+        self.errorEmbed = ErrorEmbed(
+            title=f"\u26d4 {errMsg}"
+        )
 
-        super().__init__(colour=colour, timestamp=timestamp)
+
+class PrivateView(View):
+    def __init__(self, user: discord.User, *, timeout: int = 60):
+        super().__init__(timeout=timeout)
         self.user = user
-        self.set_footer()
 
-    def set_footer(self):
-        return super().set_footer(text=f"Sent by {self.user.name}", icon_url=str(self.user.avatar.url))
+    async def interaction_check(self, interaction: discord.Interaction):
+        return interaction.user and interaction.user.id == self.user.id
+
+
+class ReportButton(Button):
+    def __init__(self, user: discord.User, ctx: commands.Context, error, *, style: ButtonStyle = ButtonStyle.danger, label: str = "Send report", emoji="\U0001f4e8"):
+        self.user = user
+        self.ctx = ctx
+        self.error = error
+        super().__init__(style=style, label=label, emoji=emoji)
+
+    async def callback(self, interaction: Interaction):
+
+        embed = SuccessEmbed(
+            title="\u2705 Report sent!",
+            timestamp=datetime.datetime.now()
+        )
+
+        embed.set_footer(
+            text=f"Sent by {self.user.name}", icon_url=str(self.user.avatar.url))
+
+        dmEmbed = ErrorEmbed(
+            title="\u26d4 Error report"
+        )
+
+        dt = datetime.datetime.now()
+        formatted = str(dt.strftime('%A %d/%m/%Y, %H:%M:%S'))
+
+        dmEmbed.add_field(
+            name=f"Exception in command **`{self.ctx.command}`**", value=formatted)
+
+        dmEmbed.set_footer(
+            text=f"Sent by {self.user.name}#{self.user.discriminator}", icon_url=str(self.user.avatar.url))
+
+        owner = interaction.client.get_user(826489186327724095)
+        ownerChat = await interaction.client.create_dm(user=owner)
+
+        exception_list = traceback.format_exception(
+            type(self.error), self.error, self.error.__traceback__)
+
+        await ownerChat.send(embed=dmEmbed)
+        await ownerChat.send(f'''
+```
+{"".join(exception_list)}
+```
+''')
+
+        await interaction.response.edit_message(embed=embed, view=None)
+
+        return await super().callback(interaction)

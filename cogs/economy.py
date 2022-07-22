@@ -7,7 +7,6 @@ from utils.subclasses import PrivateView, ClassicEmbed, ClassicDetailedEmbed, Su
 import random
 import requests
 import json
-import os
 from utils.economy_functions import add_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank, user_is_known
 
 
@@ -53,7 +52,6 @@ class Economy(commands.Cog):
             async def view_timeout():
                 embed = ErrorEmbed()
                 embed.title = "\u26d4 Time's up. No decision has been taken."
-                embed.color = 0xff0000
                 await embedToEdit.edit(embed=embed, view=None)
 
             async def conf_callback(interaction):

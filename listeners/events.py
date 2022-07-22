@@ -21,9 +21,12 @@ class Events(commands.Cog):
               f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot" + Fore.RESET)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
+
+        # if self.bot.user in message.mentions:
+        #    await message.reply("No bitches? \U0001f610")
 
         if re.fullmatch(rf"<@!?{self.bot.user.id}>", message.content):
             return await message.channel.send("No bitches? \U0001f610")
