@@ -1,4 +1,4 @@
-colorama
+rich
 aiosqlite
 easy-pil
 requests

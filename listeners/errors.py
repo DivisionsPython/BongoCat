@@ -32,18 +32,25 @@ class Errors(commands.Cog):
             embed.title = "\u26d4 You don't have the perms to run this command"
             return await ctx.channel.send(embed=embed)
 
+        elif isinstance(error, commands.MissingRequiredArgument):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 You don't have the perms to run this command"
+            return await ctx.channel.send(embed=embed)
+
         elif isinstance(error, commands.NotOwner):
             embed = ErrorEmbed()
             embed.title = f'\u26d4 {error}'
             return await ctx.channel.send(embed=embed)
 
+        elif isinstance(error, commands.CommandOnCooldown):
+            embed = ErrorEmbed()
+            embed.title = "\u26d4 Cooldown"
+            embed.add_field(name='Come on bro, chill',
+                            value=f"Try again in **{round(error.retry_after)}s**")
+            return await ctx.channel.send(embed=embed)
+
         elif isinstance(error, CustomException):
-            user = ctx.author
-
-            view = PrivateView(user=user).add_item(
-                ReportButton(user=user, ctx=ctx, error=error))
-
-            return await ctx.channel.send(embed=error.errorEmbed, view=view)
+            return await ctx.channel.send(embed=error.errorEmbed)
 
         else:  # if unhandled error, create a report message
             user = ctx.author

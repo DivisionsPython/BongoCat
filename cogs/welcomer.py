@@ -4,7 +4,7 @@ import dotenv
 from discord import ButtonStyle, Embed, SelectOption
 from discord.ext import commands
 from discord.ui import Button, View
-from utils.subclasses import PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
+from utils.subclasses import Bot, PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed, CustomException
 from utils.welcomer_functions import fetch_background, update_background, delete_welcome_channel, set_welcome_channel, guild_is_known, fetch_channel, update_welcome_channel
 from easy_pil import Editor, load_image_async, Font
 
@@ -48,7 +48,7 @@ class BgSelect(discord.ui.Select):
 
 
 class Welcomer(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.group(description=f"Welcome commands group.")
@@ -56,28 +56,21 @@ class Welcomer(commands.Cog):
     async def welcome(self, ctx):
         '''Welcome commands group. Use `help welcome` for more details.'''
         if ctx.invoked_subcommand is None:
-            embed = ErrorEmbed()
-            embed.title = '\u26d4 What do you want to do?'
-            await ctx.channel.send(embed=embed)
+            raise CustomException("What do you want to do?")
 
     @welcome.command(description="Select a channel where to send the welcome message.")
-    async def set(self, ctx, channel: discord.TextChannel = None):
+    async def set(self, ctx: commands.Context, channel: discord.TextChannel = None):
         '''Set the welcome channel.'''
-        cursor = await self.bot.connection.cursor()
-        error = ErrorEmbed()
         success = SuccessEmbed()
         warning = WarningEmbed()
-        if channel == None and await guild_is_known(cursor, ctx.guild.id):
-            channel_id = await fetch_channel(cursor, ctx.guild.id)
+        if channel == None and await guild_is_known(self.bot.dbcursor, ctx.guild.id):
+            channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
             success.title = 'Welcome message already set'
             success.add_field(name="Channel", value=f'<#{str(channel_id)}>')
             await ctx.channel.send(embed=success)
-        elif channel == None:
-            error.title = "\u26d4 No channel provided"
-            await ctx.channel.send(embed=error)
         else:
-            if await guild_is_known(cursor, ctx.guild.id):
-                channel_id = await fetch_channel(cursor, ctx.guild.id)
+            if await guild_is_known(self.bot.dbcursor, ctx.guild.id):
+                channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
                 warning.title = "\u26a0 There's a welcome channel already"
                 warning.add_field(
                     name="Channel", value=f'<#{str(channel_id)}>', inline=True)
@@ -85,69 +78,49 @@ class Welcomer(commands.Cog):
                     name="Maybe...", value=f"You wanted to update it?\nRun the command `{PREFIX}welcome update <channel>`", inline=True)
                 await ctx.channel.send(embed=warning)
             else:
-                await set_welcome_channel(self.bot.connection, ctx.guild.id, channel.id)
+                await set_welcome_channel(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id, channel.id)
                 success.title = "\u2705 Welcome channel set"
                 await ctx.channel.send(embed=success)
 
-            await cursor.close()
-
     @set.error
-    async def wrong_channel(self, ctx, error):
+    async def wrong_channel(self, ctx: commands.Context, error):
         if isinstance(error, commands.ChannelNotFound):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a text channel"
             return await ctx.channel.send(embed=embed)
-        if isinstance(error, commands.MissingPermissions):
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 You don't have the perms to run this command"
-            return await ctx.channel.send(embed=embed)
 
     @welcome.command(description="Update the channel where to send the welcome message.")
-    async def update(self, ctx, channel: discord.TextChannel = None):
+    async def update(self, ctx: commands.Context, channel: discord.TextChannel = None):
         '''Update the welcome channel.'''
-        cursor = await self.bot.connection.cursor()
-        error = ErrorEmbed()
         success = SuccessEmbed()
 
-        if await guild_is_known(cursor, ctx.guild.id):
-            if channel == None:
-                error.title = "\u26d4 No channel provided"
-                await ctx.channel.send(embed=error)
-            elif await guild_is_known(cursor, ctx.guild.id) and await fetch_channel(cursor, ctx.guild.id) == channel.id:
+        if await guild_is_known(self.bot.dbcursor, ctx.guild.id):
+            if await guild_is_known(self.bot.dbcursor, ctx.guild.id) and await fetch_channel(self.bot.dbcursor, ctx.guild.id) == channel.id:
                 embed = WarningEmbed()
                 embed.title = "\u26a0 That's the current welcome channel"
                 await ctx.channel.send(embed=embed)
             else:
-                await update_welcome_channel(self.bot.connection, ctx.guild.id, channel.id)
-                channel_id = await fetch_channel(cursor, ctx.guild.id)
+                await update_welcome_channel(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id, channel.id)
+                channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
                 success.title = "\u2705 Welcome channel updated"
                 success.add_field(
                     name="Channel", value=f'<#{str(channel_id)}>')
                 await ctx.channel.send(embed=success)
 
-            await cursor.close()
-
         else:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 No welcome channel is set"
-            await ctx.channel.send(embed=embed)
+            raise CustomException("No welcome channel is set")
 
     @update.error
-    async def wrong_channel2(self, ctx, error):
+    async def wrong_channel2(self, ctx: commands.Context, error):
         if isinstance(error, commands.ChannelNotFound):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a text channel"
             return await ctx.channel.send(embed=embed)
-        if isinstance(error, commands.MissingPermissions):
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 You don't have the perms to run this command"
-            return await ctx.channel.send(embed=embed)
 
     @welcome.command(description="Remove the channel where to send the welcome message. No welcome message will be shown.")
-    async def remove(self, ctx):
+    async def remove(self, ctx: commands.Context):
         '''Remove the welcome channel.'''
-        cursor = await self.bot.connection.cursor()
-        if await guild_is_known(cursor, ctx.guild.id):
+        if await guild_is_known(self.bot.dbcursor, ctx.guild.id):
             buttonY = Button(label='Confirm', style=ButtonStyle.green)
             buttonN = Button(label='Cancel', style=ButtonStyle.red)
             view = PrivateView(ctx.author)
@@ -158,7 +131,7 @@ class Welcomer(commands.Cog):
                 await embedToEdit.edit(embed=embed, view=None)
 
             async def conf_callback(interaction):
-                await delete_welcome_channel(self.bot.connection, ctx.guild.id)
+                await delete_welcome_channel(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id)
 
                 embed = SuccessEmbed()
                 embed.title = f"\u2705 Welcome message removed"
@@ -188,20 +161,14 @@ class Welcomer(commands.Cog):
 
             view.on_timeout = view_timeout
         else:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 No welcome channel is set"
-            await ctx.channel.send(embed=embed)
-
-        await cursor.close()
+            raise CustomException("No welcome channel is set")
 
     @welcome.command(aliases=["bg"], description="Update the background for the welcome message. Select from the options.")
-    async def background(self, ctx, background: int = None):
+    async def background(self, ctx: commands.Context, background: int = None):
         '''Update the background for the welcome message.'''
-        cursor = await self.bot.connection.cursor()
-
-        if await guild_is_known(cursor, ctx.guild.id):
+        if await guild_is_known(self.bot.dbcursor, ctx.guild.id):
             if background == None:
-                current_bg = await fetch_background(cursor, ctx.guild.id)
+                current_bg = await fetch_background(self.bot.dbcursor, ctx.guild.id)
                 buttonY = Button(label='Select', style=ButtonStyle.green)
                 buttonN = Button(label='Exit', style=ButtonStyle.red)
                 selector = BgSelect()
@@ -210,21 +177,17 @@ class Welcomer(commands.Cog):
                     success = SuccessEmbed()
                     error = ErrorEmbed()
                     bg_value = selector.get_selector_value()
-                    cursor = await self.bot.connection.cursor()
 
                     if bg_value is not None:
                         try:
-                            await update_background(self.bot.connection, ctx.guild.id, bg_value)
-                            current_bg = await fetch_background(cursor, ctx.guild.id)
+                            await update_background(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id, bg_value)
+                            current_bg = await fetch_background(self.bot.dbcursor, ctx.guild.id)
                             success.title = f"\u2705 New background index set to {current_bg}"
-
-                            await cursor.close()
 
                             await interaction.response.edit_message(embed=success, view=None)
                             view.stop()
                         except:
-                            error.title = "\u26d4 Unexpected error"
-                            await interaction.response.send_message(embed=error)
+                            raise CustomException
                     else:
                         error.title = "\u26d4 No background has been selected"
                         await interaction.response.send_message(embed=error)
@@ -256,29 +219,20 @@ class Welcomer(commands.Cog):
                     await ctx.channel.send(embed=embed)
 
         else:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 There's no welcome channel set"
-            await ctx.channel.send(embed=embed)
-
-        await cursor.close()
+            raise CustomException("There's no welcome channel set")
 
     @background.error
-    async def bg_error(self, ctx, error):
+    async def bg_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.BadArgument):
             embed = ErrorEmbed()
             embed.title = "\u26d4 That's not a valid background number"
             return await ctx.channel.send(embed=embed)
-        elif isinstance(error, commands.MissingPermissions):
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 You don't have the perms to run this command"
-            return await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        cursor = await self.bot.connection.cursor()
-        if await guild_is_known(cursor, member.guild.id):
-            bg = await fetch_background(cursor, member.guild.id)
-            channelID = await fetch_channel(cursor, member.guild.id)
+        if await guild_is_known(self.bot.dbcursor, member.guild.id):
+            bg = await fetch_background(self.bot.dbcursor, member.guild.id)
+            channelID = await fetch_channel(self.bot.dbcursor, member.guild.id)
             channel = self.bot.get_channel(channelID)
             server_name = str(member.guild.name)
 

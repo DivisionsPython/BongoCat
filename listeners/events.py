@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 import re
-import colorama
-from colorama import Fore
 import dotenv
+import rich
+from rich.console import Console
 
-colorama.init()
+
+console = Console()
 
 
 class Events(commands.Cog):
@@ -15,10 +16,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"prefix is {dotenv.dotenv_values('.env')['PREFIX']}"), status=discord.Status.idle)
-        print(Fore.GREEN +
-              f'Logged in as {self.bot.user} (Bot ID: {self.bot.user.id})' + Fore.RESET)
-        print(Fore.YELLOW + "Invite the bot: " + Fore.CYAN +
-              f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot" + Fore.RESET)
+        console.log(
+            f'\U0001f4f6 [#00ffff bold]Logged in as [#ffa500 underline]{self.bot.user}[/#ffa500 underline] (Bot ID: [#ffa500 bold]{self.bot.user.id}[/#ffa500 bold])[/#00ffff bold]')
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
