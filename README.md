@@ -49,17 +49,19 @@ python -m venv env
 env\Scripts\activate.bat
 ```
 
-4. Install [**discord.py 2.0**](https://github.com/Rapptz/discord.py)
+4. Close and re-open the `Command Prompt`
+
+5. Install [**discord.py 2.0**](https://github.com/Rapptz/discord.py)
 
 ```
 python -m pip install -U git+https://github.com/Rapptz/discord.py
 ```
 
-5. Install the bot dependencies using `pip`
+6. Install the bot dependencies using `pip`
 
 ```
 pip install -r requirements.txt
 ```
 
-6. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**.env**](.env) file
-7. Run [**main.py**](main.py)
+7. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**.env**](.env) file
+8. Run [**main.py**](main.py)
