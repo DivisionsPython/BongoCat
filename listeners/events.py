@@ -3,7 +3,7 @@ from discord.ext import commands
 import re
 import colorama
 from colorama import Fore
-from utils.config import PREFIX
+import dotenv
 
 colorama.init()
 
@@ -14,7 +14,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"prefix is {PREFIX}"), status=discord.Status.idle)
+        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"prefix is {dotenv.dotenv_values('.env')['PREFIX']}"), status=discord.Status.idle)
         print(Fore.GREEN +
               f'Logged in as {self.bot.user} (Bot ID: {self.bot.user.id})' + Fore.RESET)
         print(Fore.YELLOW + "Invite the bot: " + Fore.CYAN +

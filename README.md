@@ -17,7 +17,7 @@ It's really similar to bots like [**Dank Memer**](https://top.gg/bot/27090412697
 
 and much more.
 
-### The prefix is ">" but you can also mention the bot itself.
+### The prefix is "." but you can also mention the bot itself.
 
 ## 🔗 Documentation
 
@@ -61,5 +61,5 @@ python -m pip install -U git+https://github.com/Rapptz/discord.py
 pip install -r requirements.txt
 ```
 
-6. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**config**](./utils/config.py) file
+6. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**.env**](.env) file
 7. Run [**main.py**](main.py)

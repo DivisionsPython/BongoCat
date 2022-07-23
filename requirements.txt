@@ -2,3 +2,4 @@ colorama
 aiosqlite
 easy-pil
 requests
+python-dotenv

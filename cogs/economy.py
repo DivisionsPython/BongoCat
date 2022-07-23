@@ -1,4 +1,4 @@
-from utils.config import PREFIX, CRIMES_DIR
+import dotenv
 import discord
 from discord import ButtonStyle
 from discord.ext import commands
@@ -8,6 +8,9 @@ import random
 import requests
 import json
 from utils.economy_functions import add_user, fetch_bank, fetch_wallet, delete_user, update_wallet, update_bank, user_is_known
+
+
+PREFIX = dotenv.dotenv_values('.env')['PREFIX']
 
 
 def getName() -> str:

@@ -1,12 +1,15 @@
 import discord
 import os
+import dotenv
 from discord import ButtonStyle, Embed, SelectOption
 from discord.ext import commands
 from discord.ui import Button, View
-from utils.config import PREFIX, BACKGOUNDS_DIR
 from utils.subclasses import PrivateView, ClassicEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
 from utils.welcomer_functions import fetch_background, update_background, delete_welcome_channel, set_welcome_channel, guild_is_known, fetch_channel, update_welcome_channel
 from easy_pil import Editor, load_image_async, Font
+
+PREFIX = dotenv.dotenv_values('.env')['PREFIX']
+BACKGOUNDS_DIR = dotenv.dotenv_values('.env')['BACKGOUNDS_DIR']
 
 
 class BgSelect(discord.ui.Select):
