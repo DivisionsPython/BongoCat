@@ -6,7 +6,6 @@ import os
 import aiosqlite
 import datetime
 import traceback
-import rich
 from rich.console import Console
 
 
@@ -64,6 +63,8 @@ class Bot(commands.Bot):
         await self.dbconnection.commit()
         await self.dbcursor.close()
         await self.dbconnection.close()
+        console.print('The bot has been turned off',
+                      style='#ff0000 bold on #ffffff')
         return await super().close()
 
 
