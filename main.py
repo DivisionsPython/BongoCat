@@ -13,6 +13,6 @@ bot = Bot(
     command_prefix=commands.when_mentioned_or(dotenv.dotenv_values('.env')['PREFIX']), intents=intents, case_insensitive=True, help_command=MyHelpCommand())
 
 
-if __name__ in '__main__':
+if __name__ == '__main__':
     console.print(figlet_format('BongoCat', 'standard'), style='#dda7ff')
     bot.run(dotenv.dotenv_values('.env')['TOKEN'])
