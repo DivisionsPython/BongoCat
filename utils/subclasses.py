@@ -246,8 +246,12 @@ class ReportButton(Button):
         dmEmbed.set_footer(
             text=f"Sent by {self.user.name}#{self.user.discriminator}", icon_url=str(self.user.avatar.url))
 
-        owner = interaction.client.get_user(826489186327724095)
+        owner_appdetails = await interaction.client.application_info()
+        owner = interaction.client.get_user(owner_appdetails.owner.id)
         ownerChat = await interaction.client.create_dm(user=owner)
+
+        user = interaction.client.get_user(self.user.id)
+        userChat = await interaction.client.create_dm(user=user)
 
         exception_list = traceback.format_exception(
             type(self.error), self.error, self.error.__traceback__)
@@ -258,6 +262,8 @@ class ReportButton(Button):
 {"".join(exception_list)}
 ```
 ''')
+
+        await userChat.send(f"**{self.user.name}** thanks so much for your report, we will check what's wrong as soon as possible :)")
 
         await interaction.response.edit_message(embed=embed, view=None)
 
