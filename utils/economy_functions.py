@@ -2,7 +2,7 @@ import aiosqlite
 import discord
 
 
-async def add_user(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: discord.User | int, wallet: int = 0, bank: int = 0) -> None:
+async def add_user(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: int | discord.User, wallet: int = 0, bank: int = 0) -> None:
     """
     Function to add a user to the database.
 
@@ -37,7 +37,7 @@ async def add_user(database_connection: aiosqlite.Connection, database_cursor: a
     await database_connection.commit()
 
 
-async def fetch_user(database_cursor: aiosqlite.Cursor, user: discord.User | int) -> aiosqlite.Row | None:
+async def fetch_user(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
     """
     Function used by `user_is_known` to check the existence of a user in the database.
 
@@ -52,7 +52,7 @@ async def fetch_user(database_cursor: aiosqlite.Cursor, user: discord.User | int
         return output
 
 
-async def user_is_known(database_cursor: aiosqlite.Cursor, user: discord.User | int) -> bool:
+async def user_is_known(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> bool:
     """
     Function to check if a user is present in the database.
 
@@ -75,7 +75,7 @@ async def user_is_known(database_cursor: aiosqlite.Cursor, user: discord.User | 
     return await fetch_user(database_cursor, user) == user
 
 
-async def fetch_wallet(database_cursor: aiosqlite.Cursor, user: discord.User | int) -> int | aiosqlite.Row:
+async def fetch_wallet(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> int | aiosqlite.Row:
     """
     Function to fetch a user's wallet from the database.
 
@@ -97,7 +97,7 @@ async def fetch_wallet(database_cursor: aiosqlite.Cursor, user: discord.User | i
     return (await database_cursor.fetchone())[0]
 
 
-async def fetch_bank(database_cursor: aiosqlite.Cursor, user: discord.User | int) -> int | aiosqlite.Row:
+async def fetch_bank(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> int | aiosqlite.Row:
     """
     Function to fetch a user's bank from the database.
 
@@ -119,7 +119,7 @@ async def fetch_bank(database_cursor: aiosqlite.Cursor, user: discord.User | int
     return (await database_cursor.fetchone())[0]
 
 
-async def delete_user(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: discord.User | int) -> None:
+async def delete_user(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: int | discord.User) -> None:
     """
     Function to remove a user from the database.
 
@@ -142,7 +142,7 @@ async def delete_user(database_connection: aiosqlite.Connection, database_cursor
     await database_connection.commit()
 
 
-async def update_wallet(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: discord.User | int, wallet: int = 0) -> None:
+async def update_wallet(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: int | discord.User, wallet: int = 0) -> None:
     """
     Function to update a user's wallet in the database.
 
@@ -168,7 +168,7 @@ async def update_wallet(database_connection: aiosqlite.Connection, database_curs
     await database_connection.commit()
 
 
-async def update_bank(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: discord.User | int, bank: int = 0) -> None:
+async def update_bank(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, user: int | discord.User, bank: int = 0) -> None:
     """
     Function to update a user's bank in the database.
 

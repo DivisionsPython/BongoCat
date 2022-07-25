@@ -13,6 +13,18 @@ console = Console()
 
 
 class Bot(commands.Bot):
+    """
+    Subclass of `discord.ext.commands.Bot` with automatic extensions loading and database connection.
+
+    Parameters added
+    ----------------
+    dbconnection: `aiosqlite.Connection`
+        The connection to the database.
+
+    dbcursor: `aiosqlite.Cursor`
+        The cursor connected to the database.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dbconnection = None
@@ -69,6 +81,15 @@ class Bot(commands.Bot):
 
 
 class ClassicDetailedEmbed(discord.Embed):
+    """
+    Subclass of `discord.Embed` with automatic footer and timestamp.
+
+    Parameters added
+    ----------------
+    user: `discord.User`
+        The user needed to create the string "Requested by <user>".
+    """
+
     def __init__(self, user: discord.User, *, colour: discord.Colour = 0xdda7ff, timestamp: datetime.datetime = None):
         if timestamp == None:
             timestamp = datetime.datetime.now()
@@ -82,26 +103,62 @@ class ClassicDetailedEmbed(discord.Embed):
 
 
 class ClassicEmbed(discord.Embed):
+    """
+    Subclass of `discord.Embed` with default `color` parameter (`#dda7ff`).
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xdda7ff))
 
 
 class SuccessEmbed(discord.Embed):
+    """
+    Subclass of `discord.Embed` with default `color` parameter (`#00e600`).
+
+    Used to reply to a successful operation.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0x00e600))
 
 
 class WarningEmbed(discord.Embed):
+    """
+    Subclass of `discord.Embed` with default `color` parameter (`#eed202`).
+
+    Used to reply to a warning/possibly dangerous operation.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xeed202))
 
 
 class ErrorEmbed(discord.Embed):
+    """
+    Subclass of `discord.Embed` with default `color` parameter (`#00e600`).
+
+    Used to reply to a failed operation/raised error.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, colour=kwargs.pop("colour", 0xff0000))
 
 
 class CustomException(Exception):
+    """
+    Subclass of `Exception` containing an attribute with a `discord.Embed` used to be returned in chat.
+
+    Parameters
+    ----------
+    error_message: `str`
+        The message the exception is raised with, also the `discord.Embed.title` parameter in the embed attribute.
+
+    Attributes added
+    ----------------
+    errorEmbed: `utils.subclasses.ErrorEmbed | discord.Embed`
+        The embed used to be returned in chat.
+    """
+
     def __init__(self, error_message: str = "Unexpected error") -> None:
         super().__init__(error_message)
         self.errorEmbed = ErrorEmbed(
@@ -110,6 +167,20 @@ class CustomException(Exception):
 
 
 class PrivateView(View):
+    """
+    Subclass of `discord.ui.View` interactable by only one given user.
+
+    Parameters added
+    ----------------
+    user: `discord.User`
+        The only user who will be able to interact.
+
+    Parameters modified
+    -------------------
+    timeout: `int`
+        Default modified from 180 seconds to 60 seconds, as this view is usually used for user confirmations and doesn't need that much time.
+    """
+
     def __init__(self, user: discord.User, *, timeout: int = 60):
         super().__init__(timeout=timeout)
         self.user = user
@@ -119,6 +190,33 @@ class PrivateView(View):
 
 
 class ReportButton(Button):
+    """
+    Subclass of `discord.ui.Button` used to report an unexpected command error with its traceback (Windows terminal `stderr`) to the bot owner's dms.
+
+    Parameters added
+    ----------------
+    user: `discord.User`
+        In the report message, the embed will show the user who reported the error.
+
+    ctx: `discord.ext.commands.Context`
+        In the report message, the embed will show the command that raised the error. Also used to catch the traceback.
+
+    error:
+        The actual error instance, caught by the error handlers.
+
+    Parameters modified
+    -------------------
+    style: `discord.ButtonStyle`
+        Default modified from `default` to `danger`.
+
+    label: `str`
+        The button text. Default set to "Send report".
+
+    emoji: `str | discord.Emoji | discord.PartialEmoji`
+        The button emoji. Default set to `incoming_envelope`.
+        [Link to emoji](https://emojipedia.org/incoming-envelope/)
+    """
+
     def __init__(self, user: discord.User, ctx: commands.Context, error, *, style: ButtonStyle = ButtonStyle.danger, label: str = "Send report", emoji: Emoji | PartialEmoji | str = "\U0001f4e8"):
         self.user = user
         self.ctx = ctx
