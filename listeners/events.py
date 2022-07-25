@@ -2,15 +2,15 @@ import discord
 from discord.ext import commands
 import re
 import dotenv
-import rich
 from rich.console import Console
+from utils.subclasses import Bot
 
 
 console = Console()
 
 
 class Events(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -31,5 +31,5 @@ class Events(commands.Cog):
             return await message.channel.send("No bitches? \U0001f610")
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Events(bot))

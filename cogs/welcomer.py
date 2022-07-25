@@ -53,7 +53,7 @@ class Welcomer(commands.Cog):
 
     @commands.group(description=f"Welcome commands group.")
     @commands.has_permissions(administrator=True)
-    async def welcome(self, ctx):
+    async def welcome(self, ctx: commands.Context):
         '''Welcome commands group. Use `help welcome` for more details.'''
         if ctx.invoked_subcommand is None:
             raise CustomException("What do you want to do?")
@@ -229,7 +229,7 @@ class Welcomer(commands.Cog):
             return await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member | discord.User):
         if await guild_is_known(self.bot.dbcursor, member.guild.id):
             bg = await fetch_background(self.bot.dbcursor, member.guild.id)
             channelID = await fetch_channel(self.bot.dbcursor, member.guild.id)
@@ -289,5 +289,5 @@ class Welcomer(commands.Cog):
                     pass
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Welcomer(bot))

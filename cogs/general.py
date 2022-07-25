@@ -4,22 +4,22 @@ import datetime
 from discord.ui import Button, View
 from discord import ButtonStyle
 from discord import Spotify
-from utils.subclasses import ClassicDetailedEmbed, ClassicEmbed, ErrorEmbed
+from utils.subclasses import ClassicDetailedEmbed, ClassicEmbed, ErrorEmbed, Bot, CustomException
 
 
 class General(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(aliases=["latency"], description="Check the bot's latency.")
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context):
         '''Check the bot's latency.'''
         embed = ClassicDetailedEmbed(user=ctx.author)
         embed.title = f'\U0001f4e1 My latency is **{round(self.bot.latency * 1000)}ms**'
         await ctx.channel.send(embed=embed)
 
     @commands.command(description="Invite the bot to your discord server.")
-    async def invite(self, ctx):
+    async def invite(self, ctx: commands.Context):
         '''Invite the bot to your Discord server.'''
         button = Button(
             label='Invite', url=f"https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot", style=ButtonStyle.url)
@@ -31,7 +31,7 @@ class General(commands.Cog):
         await ctx.channel.send(embed=embed, view=view)
 
     @commands.command(aliases=["whois"], description="Check a user's profile details. Also download their avatar and banner ;)")
-    async def userinfo(self, ctx, member: discord.Member = None):
+    async def userinfo(self, ctx: commands.Context, member: discord.Member = None):
         '''Check a user's profile details.'''
         if member == None:
             member = ctx.author
@@ -132,7 +132,7 @@ class General(commands.Cog):
         await ctx.channel.send(embed=embed, view=view)
 
     @commands.command(aliases=["listening"], description="Check a user's Spotify listening activity. This command only checks for the user's Discord activity, this means it won't work if the activity is not displayed.")
-    async def spotify(self, ctx, member: discord.Member = None):
+    async def spotify(self, ctx: commands.Context, member: discord.Member = None):
         '''Check a user's Spotify listening activity.'''
         if member == None:
             member = ctx.author
@@ -163,14 +163,10 @@ class General(commands.Cog):
                 await ctx.channel.send(embed=embed, view=view)
                 break
         else:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 No Spotify activity found"
-            embed.add_field(name='Maybe...',
-                            value=f"{member.name} might not be listening to Spotify, or maybe the activity is not displayed.")
-            await ctx.channel.send(embed=embed)
+            raise CustomException("No Spotify activity found")
 
     @commands.command()
-    async def emoji(self, ctx, emoji: discord.PartialEmoji):
+    async def emoji(self, ctx: commands.Context, emoji: discord.PartialEmoji):
         embed = ClassicDetailedEmbed(user=ctx.author)
 
         button = Button(
@@ -187,5 +183,5 @@ class General(commands.Cog):
         await ctx.channel.send(embed=embed, view=view)
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(General(bot))

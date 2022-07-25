@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 import os
 import sys
@@ -53,7 +52,7 @@ class Owner(commands.Cog):
 
     @commands.command(hidden=True, description="**`BOT OWNER ONLY`**\n\nDisable a command.")
     @commands.is_owner()
-    async def disable(self, ctx: commands.Context, command: str | commands.Command = None):
+    async def disable(self, ctx: commands.Context, command: commands.Command | str = None):
         if command == None:
             await ctx.channel.send("Which command do you want to disable?")
         else:
@@ -83,5 +82,5 @@ class Owner(commands.Cog):
             await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Owner(bot))

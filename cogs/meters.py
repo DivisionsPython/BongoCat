@@ -1,15 +1,15 @@
 import discord
 from discord.ext import commands
 import random
-from utils.subclasses import ClassicEmbed
+from utils.subclasses import ClassicEmbed, Bot
 
 
 class Meters(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(description="How cool are you? Check it out \U0001f60e")
-    async def cool(self, ctx, member: discord.Member = None):
+    async def cool(self, ctx: commands.Context, member: discord.Member = None):
         '''How cool?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -20,7 +20,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(aliases=["howgay", "howgae", "gay"], description="Bro what are you doing with the homies? \U0001f928")
-    async def gae(self, ctx, member: discord.Member = None):
+    async def gae(self, ctx: commands.Context, member: discord.Member = None):
         '''How gae?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -31,7 +31,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(description="How sexy are you? Please tell us \U0001f60d")
-    async def sexy(self, ctx, member: discord.Member = None):
+    async def sexy(self, ctx: commands.Context, member: discord.Member = None):
         '''How sexy?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -42,7 +42,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(description="What's 1 + 1 dude? \U0001f928")
-    async def dumb(self, ctx, member: discord.Member = None):
+    async def dumb(self, ctx: commands.Context, member: discord.Member = None):
         '''How dumb?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -53,7 +53,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(description="I've always wanted a waifu, and you? \U0001f60d")
-    async def waifu(self, ctx, member: discord.Member = None):
+    async def waifu(self, ctx: commands.Context, member: discord.Member = None):
         '''Are you a waifu?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -64,7 +64,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(description="Imagine simping. BOZO \U0001f913")
-    async def simp(self, ctx, member: discord.Member = None):
+    async def simp(self, ctx: commands.Context, member: discord.Member = None):
         '''Are you a simp?'''
         embed = ClassicEmbed()
         if member == None or member.id == ctx.author.id:
@@ -75,7 +75,7 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @commands.command(description="How long is your shlong? \U0001f633")
-    async def pp(self, ctx, member: discord.Member = None):
+    async def pp(self, ctx: commands.Context, member: discord.Member = None):
         '''How long is your pp?'''
         choice = random.randrange(0, 17)
         embed = ClassicEmbed()
@@ -93,5 +93,5 @@ class Meters(commands.Cog):
             await ctx.channel.send(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Meters(bot))

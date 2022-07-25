@@ -1,10 +1,9 @@
-import discord
 from discord.ext import commands
-from utils.subclasses import ReportButton, CustomException, ErrorEmbed, PrivateView
+from utils.subclasses import ReportButton, CustomException, ErrorEmbed, PrivateView, Bot
 
 
 class Errors(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -61,5 +60,5 @@ class Errors(commands.Cog):
             return await ctx.channel.send(embed=ErrorEmbed(title=f'\u26d4 Unexpected error'), view=view)
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Errors(bot))

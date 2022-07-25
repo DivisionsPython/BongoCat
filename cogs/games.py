@@ -3,15 +3,15 @@ import discord
 from discord.ext import commands
 import requests
 import random
-from utils.subclasses import ClassicEmbed, SuccessEmbed, ErrorEmbed
+from utils.subclasses import ClassicEmbed, SuccessEmbed, ErrorEmbed, Bot, CustomException
 
 
 class Games(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(description="Do your best to guess the word! Send a letter in the chat, and hope it's correct.")
-    async def hangman(self, ctx):
+    async def hangman(self, ctx: commands.Context):
         '''Play the famous game "Hangman".'''
 
         def getWord() -> str:
@@ -149,15 +149,11 @@ class Games(commands.Cog):
                     await embedToEdit.edit(embed=embed)
 
         except asyncio.TimeoutError:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 Time's up. Game has ended."
-            await embedToEdit.edit(embed=embed)
+            raise CustomException("Time's up. Game has ended.")
 
         except:
-            embed = ErrorEmbed()
-            embed.title = "\u26d4 Unexpected error."
-            await embedToEdit.edit(embed=embed)
+            raise CustomException
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Games(bot))

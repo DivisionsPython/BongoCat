@@ -69,7 +69,7 @@ class Bot(commands.Bot):
 
 
 class ClassicDetailedEmbed(discord.Embed):
-    def __init__(self, user: discord.User, *, colour=0xdda7ff, timestamp=None):
+    def __init__(self, user: discord.User, *, colour: discord.Colour = 0xdda7ff, timestamp: datetime.datetime = None):
         if timestamp == None:
             timestamp = datetime.datetime.now()
 
@@ -102,7 +102,7 @@ class ErrorEmbed(discord.Embed):
 
 
 class CustomException(Exception):
-    def __init__(self, error_message: str | None = "Unexpected error") -> None:
+    def __init__(self, error_message: str = "Unexpected error") -> None:
         super().__init__(error_message)
         self.errorEmbed = ErrorEmbed(
             title=f"\u26d4 {error_message}"
@@ -119,7 +119,7 @@ class PrivateView(View):
 
 
 class ReportButton(Button):
-    def __init__(self, user: discord.User, ctx: commands.Context, error, *, style: ButtonStyle = ButtonStyle.danger, label: str = "Send report", emoji="\U0001f4e8"):
+    def __init__(self, user: discord.User, ctx: commands.Context, error, *, style: ButtonStyle = ButtonStyle.danger, label: str = "Send report", emoji: Emoji | PartialEmoji | str = "\U0001f4e8"):
         self.user = user
         self.ctx = ctx
         self.error = error

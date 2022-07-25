@@ -210,7 +210,7 @@ class Economy(commands.Cog):
 
     @commands.command(aliases=["rob"], cooldown_after_parsing=True, description="Oh so you're a real criminal \U0001f977 Try to get some money from someone's bank. Pay attention to don't get caught \U0001f693")
     @commands.cooldown(1, 90, commands.BucketType.user)
-    async def bankrob(self, ctx, member: discord.Member):
+    async def bankrob(self, ctx: commands.Context, member: discord.Member):
         """Try stealing coins from someone's bank."""
         error = ErrorEmbed()
         success = SuccessEmbed()
@@ -288,5 +288,5 @@ class Economy(commands.Cog):
                     await message.channel.send(f"{message.author.name}, you got lucky and randomly gained {amount}$ \U0001f604")
 
 
-async def setup(bot):
+async def setup(bot: Bot):
     await bot.add_cog(Economy(bot))
