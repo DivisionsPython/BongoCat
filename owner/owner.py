@@ -68,6 +68,7 @@ class Owner(commands.Cog):
     async def reboot(self, ctx: commands.Context):
         try:
             await ctx.channel.send('**`RESTARTING...`**')
+            os.system('cls')
             os.execl(sys.executable, os.path.abspath("main.py"), *sys.argv)
         except Exception as e:
             await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')

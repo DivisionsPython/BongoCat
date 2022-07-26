@@ -58,11 +58,45 @@ class Bot(commands.Bot):
         try:
             self.dbconnection = await aiosqlite.connect('.\databases\database.sqlite')
             self.dbcursor = await self.dbconnection.cursor()
-            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS eco (
-                user_id INTEGER, wallet INTEGER, bank INTEGER
+            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS economy (
+                user_id INTEGER,
+                wallet INTEGER DEFAULT 0,
+                bank INTEGER DEFAULT 0
                 )''')
             await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS welcomer (
-                guild_id INTEGER, channel_id INTEGER, background INTEGER
+                guild_id INTEGER,
+                channel_id INTEGER,
+                background INTEGER DEFAULT 1
+                )''')
+            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS hunting_animals (
+                user_id INTEGER,
+                bee INTEGER DEFAULT 0,
+                bug INTEGER DEFAULT 0,
+                snail INTEGER DEFAULT 0,
+                rabbit2 INTEGER DEFAULT 0,
+                chipmunk INTEGER DEFAULT 0,
+                sheep INTEGER DEFAULT 0,
+                pig2 INTEGER DEFAULT 0,
+                cow2 INTEGER DEFAULT 0,
+                deer INTEGER DEFAULT 0,
+                owl INTEGER DEFAULT 0,
+                boar INTEGER DEFAULT 0,
+                frog INTEGER DEFAULT 0,
+                wolf INTEGER DEFAULT 0,
+                lizard INTEGER DEFAULT 0,
+                snake INTEGER DEFAULT 0
+                )''')
+            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS hunting_weapons (
+                user_id INTEGER,
+                axe INTEGER DEFAULT 0,
+                knife INTEGER DEFAULT 1,
+                staff INTEGER DEFAULT 1,
+                sword INTEGER DEFAULT 1,
+                dagger INTEGER DEFAULT 0,
+                hammer INTEGER DEFAULT 0,
+                mace INTEGER DEFAULT 0,
+                pickaxe INTEGER DEFAULT 1,
+                sickle INTEGER DEFAULT 0
                 )''')
             await self.dbconnection.commit()
         except:

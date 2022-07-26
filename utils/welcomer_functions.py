@@ -2,7 +2,7 @@ import aiosqlite
 import discord
 
 
-async def set_welcome_channel(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, guild: int | discord.Guild, channel: int | discord.TextChannel, background: int = 1):
+async def set_welcome_channel(database_connection: aiosqlite.Connection, database_cursor: aiosqlite.Cursor, guild: int | discord.Guild, channel: int | discord.TextChannel):
     """
     Function to add a welcome channel to the database.
 
@@ -20,17 +20,11 @@ async def set_welcome_channel(database_connection: aiosqlite.Connection, databas
     channel: `int` (`discord.TextChannel.id`)
         The ID of the channel where the bot will send the welcome message.
 
-    background: `int`
-        The default background index set when the guild is added to the database.
-
-        KEEP THE VALUE 1
-        ----------------
-
     Returns
     -------
     A new row of data in the database.
     """
-    await database_cursor.execute('INSERT INTO welcomer VALUES (:guild_id, :channel_id, :background)', {'guild_id': guild, 'channel_id': channel, 'background': background})
+    await database_cursor.execute('INSERT INTO welcomer (guild_id, channel_id) VALUES (:guild_id, :channel_id)', {'guild_id': guild, 'channel_id': channel})
     await database_connection.commit()
 
 
