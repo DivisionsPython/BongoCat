@@ -68,7 +68,7 @@ class Bot(commands.Bot):
                 channel_id INTEGER,
                 background INTEGER DEFAULT 1
                 )''')
-            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS hunting_animals (
+            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS animals (
                 user_id INTEGER,
                 bee INTEGER DEFAULT 0,
                 bug INTEGER DEFAULT 0,
@@ -86,7 +86,7 @@ class Bot(commands.Bot):
                 lizard INTEGER DEFAULT 0,
                 snake INTEGER DEFAULT 0
                 )''')
-            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS hunting_weapons (
+            await self.dbcursor.execute('''CREATE TABLE IF NOT EXISTS weapons (
                 user_id INTEGER,
                 axe INTEGER DEFAULT 0,
                 knife INTEGER DEFAULT 1,

@@ -22,10 +22,12 @@ async def add_user(database_connection: aiosqlite.Connection, database_cursor: a
     A new row of data in the database.
     """
     await database_cursor.execute('INSERT INTO economy (user_id) VALUES (:user_id)', {'user_id': user})
+    await database_cursor.execute('INSERT INTO animals (user_id) VALUES (:user_id)', {'user_id': user})
+    await database_cursor.execute('INSERT INTO weapons (user_id) VALUES (:user_id)', {'user_id': user})
     await database_connection.commit()
 
 
-async def fetch_user(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
+async def fetch_user_economy(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
     """
     Function used by `user_is_known` to check the existence of a user in the database.
 
@@ -33,6 +35,36 @@ async def fetch_user(database_cursor: aiosqlite.Cursor, user: int | discord.User
     ----------
     """
     await database_cursor.execute('SELECT user_id FROM economy WHERE user_id = :user_id', {'user_id': user})
+    output = await database_cursor.fetchone()
+    if output is not None:
+        return output[0]
+    else:
+        return output
+
+
+async def fetch_user_animals(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
+    """
+    Function used by `user_is_known` to check the existence of a user in the database.
+
+    DO NOT USE
+    ----------
+    """
+    await database_cursor.execute('SELECT user_id FROM animals WHERE user_id = :user_id', {'user_id': user})
+    output = await database_cursor.fetchone()
+    if output is not None:
+        return output[0]
+    else:
+        return output
+
+
+async def fetch_user_weapons(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
+    """
+    Function used by `user_is_known` to check the existence of a user in the database.
+
+    DO NOT USE
+    ----------
+    """
+    await database_cursor.execute('SELECT user_id FROM weapons WHERE user_id = :user_id', {'user_id': user})
     output = await database_cursor.fetchone()
     if output is not None:
         return output[0]
@@ -60,7 +92,10 @@ async def user_is_known(database_cursor: aiosqlite.Cursor, user: int | discord.U
 
         `False`: the user is not present in the database.
     """
-    return await fetch_user(database_cursor, user) == user
+    economy = await fetch_user_economy(database_cursor, user)
+    animals = await fetch_user_animals(database_cursor, user)
+    weapons = await fetch_user_weapons(database_cursor, user)
+    return all(x == user for x in (economy, animals, weapons))
 
 
 async def fetch_wallet(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> int | aiosqlite.Row:
@@ -127,6 +162,8 @@ async def delete_user(database_connection: aiosqlite.Connection, database_cursor
     The deletion of a row of data from the database.
     """
     await database_cursor.execute('DELETE from economy WHERE user_id = :user_id', {'user_id': user})
+    await database_cursor.execute('DELETE from animals WHERE user_id = :user_id', {'user_id': user})
+    await database_cursor.execute('DELETE from weapons WHERE user_id = :user_id', {'user_id': user})
     await database_connection.commit()
 
 
