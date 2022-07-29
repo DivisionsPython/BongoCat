@@ -120,6 +120,11 @@ class Owner(commands.Cog):
         except Exception as e:
             await ctx.channel.send(f'**`ERROR:`** {type(e).__name__} - {e}')
 
+    @commands.command(hidden=True, description="**`BOT OWNER ONLY`**\n\nRaise an unhandled exception (testing).")
+    @commands.is_owner()
+    async def error(self, ctx: commands.Context):
+        raise TypeError("Unhandled exception (testing)")
+
 
 async def setup(bot: Bot):
     await bot.add_cog(Owner(bot))
