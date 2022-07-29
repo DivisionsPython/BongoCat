@@ -65,3 +65,7 @@ pip install -r requirements.txt
 
 7. Provide the [**bot's token**](https://discord.com/developers/applications) in the [**.env**](.env) file
 8. Run [**main.py**](main.py)
+
+### Post Scriptum
+
+Big shout-out to [**Sourcery**](https://sourcery.ai/), as I used their extension to create better code.

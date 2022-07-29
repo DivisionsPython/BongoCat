@@ -8,8 +8,8 @@ class Rpg(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def inventory(self, ctx: commands.Context):
-        pass
+    async def test(self, ctx: commands.Context):
+        raise TypeError
 
 
 async def setup(bot: Bot):

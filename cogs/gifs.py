@@ -17,20 +17,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"Aw come on {ctx.author.name}, I'll give you a kiss \U0001f97a", f"That's sad, {ctx.author.name} :("]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
@@ -47,20 +45,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"Chill {ctx.author.name}, Don't hurt yourself >:(", f"{ctx.author.name} why :("]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
@@ -77,20 +73,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"Tf are you doing {ctx.author.name}? Don't! \U0001f624", f"{ctx.author.name} DON'T PUNCH YOURSELF"]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
@@ -107,20 +101,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"Do you want a hug {ctx.author.name}? \U0001f97a", f"Aw {ctx.author.name} :("]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
@@ -137,20 +129,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"I'm here for you {ctx.author.name} \U0001f97a", f"Aw {ctx.author.name} :("]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:
@@ -167,20 +157,18 @@ class Gifs(commands.Cog):
         lmt = 50
 
         r = requests.get(
-            "https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (search_term, apikey, lmt))
+            f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={lmt}")
 
         gif_list = []
         sadReplyList = [
             f"I'm here for you {ctx.author.name} \U0001f97a", f"Aw {ctx.author.name} :("]
 
-        if r.status_code == 200:
-            data = r.json()
-            for details in data["results"]:
-                for media in details["media"]:
-                    gif_list.append(media["gif"]["url"])
-        else:
+        if r.status_code != 200:
             raise CustomException("Error connecting to the Tenor API")
 
+        data = r.json()
+        for details in data["results"]:
+            gif_list.extend(media["gif"]["url"] for media in details["media"])
         if member == ctx.author:
             await ctx.channel.send(random.choice(sadReplyList))
         else:

@@ -33,7 +33,7 @@ class Bot(commands.Bot):
     async def setup_hook(self):
         for extension in [f.replace('.py', '') for f in os.listdir("listeners") if os.path.isfile(os.path.join("listeners", f))]:
             try:
-                await self.load_extension("listeners." + extension)
+                await self.load_extension(f"listeners.{extension}")
             except (discord.ClientException, ModuleNotFoundError):
                 console.log(
                     f'\u26d4 Failed to load extension: {extension}', style="#ff0000 bold on #ffffff")
@@ -41,7 +41,7 @@ class Bot(commands.Bot):
 
         for extension in [f.replace('.py', '') for f in os.listdir("owner") if os.path.isfile(os.path.join("owner", f))]:
             try:
-                await self.load_extension("owner." + extension)
+                await self.load_extension(f"owner.{extension}")
             except (discord.ClientException, ModuleNotFoundError):
                 console.log(
                     f'\u26d4 Failed to load extension: {extension}', style="#ff0000 bold on #ffffff")
@@ -49,7 +49,7 @@ class Bot(commands.Bot):
 
         for extension in [f.replace('.py', '') for f in os.listdir("cogs") if os.path.isfile(os.path.join("cogs", f))]:
             try:
-                await self.load_extension("cogs." + extension)
+                await self.load_extension(f"cogs.{extension}")
             except (discord.ClientException, ModuleNotFoundError):
                 console.log(
                     f'\u26d4 Failed to load extension: {extension}', style="#ff0000 bold on #ffffff")
@@ -99,7 +99,7 @@ class Bot(commands.Bot):
                 sickle INTEGER DEFAULT 0
                 )''')
             await self.dbconnection.commit()
-        except:
+        except Exception:
             console.log('\u26d4 Error loading database',
                         style="#ff0000 bold on #ffffff")
         else:
@@ -125,7 +125,7 @@ class ClassicDetailedEmbed(discord.Embed):
     """
 
     def __init__(self, user: discord.User, *, colour: discord.Colour = 0xdda7ff, timestamp: datetime.datetime = None):
-        if timestamp == None:
+        if timestamp is None:
             timestamp = datetime.datetime.now()
 
         super().__init__(colour=colour, timestamp=timestamp)

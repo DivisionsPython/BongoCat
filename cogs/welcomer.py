@@ -1,3 +1,4 @@
+import contextlib
 import discord
 import os
 import dotenv
@@ -51,7 +52,7 @@ class Welcomer(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.group(description=f"Welcome commands group.")
+    @commands.group(description="Welcome commands group.")
     @commands.has_permissions(administrator=True)
     async def welcome(self, ctx: commands.Context):
         '''Welcome commands group. Use `help welcome` for more details.'''
@@ -63,24 +64,23 @@ class Welcomer(commands.Cog):
         '''Set the welcome channel.'''
         success = SuccessEmbed()
         warning = WarningEmbed()
-        if channel == None and await guild_is_known(self.bot.dbcursor, ctx.guild.id):
+        if channel is None and await guild_is_known(self.bot.dbcursor, ctx.guild.id):
             channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
             success.title = 'Welcome message already set'
             success.add_field(name="Channel", value=f'<#{str(channel_id)}>')
             await ctx.channel.send(embed=success)
+        elif await guild_is_known(self.bot.dbcursor, ctx.guild.id):
+            channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
+            warning.title = "\u26a0 There's a welcome channel already"
+            warning.add_field(
+                name="Channel", value=f'<#{str(channel_id)}>', inline=True)
+            warning.add_field(
+                name="Maybe...", value=f"You wanted to update it?\nRun the command `{PREFIX}welcome update <channel>`", inline=True)
+            await ctx.channel.send(embed=warning)
         else:
-            if await guild_is_known(self.bot.dbcursor, ctx.guild.id):
-                channel_id = await fetch_channel(self.bot.dbcursor, ctx.guild.id)
-                warning.title = "\u26a0 There's a welcome channel already"
-                warning.add_field(
-                    name="Channel", value=f'<#{str(channel_id)}>', inline=True)
-                warning.add_field(
-                    name="Maybe...", value=f"You wanted to update it?\nRun the command `{PREFIX}welcome update <channel>`", inline=True)
-                await ctx.channel.send(embed=warning)
-            else:
-                await set_welcome_channel(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id, channel.id)
-                success.title = "\u2705 Welcome channel set"
-                await ctx.channel.send(embed=success)
+            await set_welcome_channel(self.bot.dbconnection, self.bot.dbcursor, ctx.guild.id, channel.id)
+            success.title = "\u2705 Welcome channel set"
+            await ctx.channel.send(embed=success)
 
     @set.error
     async def wrong_channel(self, ctx: commands.Context, error):
@@ -230,63 +230,62 @@ class Welcomer(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member | discord.User):
-        if await guild_is_known(self.bot.dbcursor, member.guild.id):
-            bg = await fetch_background(self.bot.dbcursor, member.guild.id)
-            channelID = await fetch_channel(self.bot.dbcursor, member.guild.id)
-            channel = self.bot.get_channel(channelID)
-            server_name = str(member.guild.name)
+        if not await guild_is_known(self.bot.dbcursor, member.guild.id):
+            return
+        bg = await fetch_background(self.bot.dbcursor, member.guild.id)
+        channelID = await fetch_channel(self.bot.dbcursor, member.guild.id)
+        channel = self.bot.get_channel(channelID)
+        server_name = str(member.guild.name)
 
-            background = Editor(f"./utils/img/bg/{bg}.jpg")
-            pfp = await load_image_async(str(member.avatar.url))
-            profile = Editor(pfp).resize((420, 420)).circle_image()
+        background = Editor(f"./utils/img/bg/{bg}.jpg")
+        pfp = await load_image_async(str(member.avatar.url))
+        profile = Editor(pfp).resize((420, 420)).circle_image()
 
-            if len(member.guild.name) <= 20:
-                guild_name_font_size = 130
-                guild_name_font_outline_size = 132
-            elif 20 < len(member.guild.name) <= 25:
-                guild_name_font_size = 120
-                guild_name_font_outline_size = 122
-            else:
-                guild_name_font_size = 130
-                guild_name_font_outline_size = 132
-                server_name = "This server"
+        if len(member.guild.name) <= 20:
+            guild_name_font_size = 130
+            guild_name_font_outline_size = 132
+        elif 20 < len(member.guild.name) <= 25:
+            guild_name_font_size = 120
+            guild_name_font_outline_size = 122
+        else:
+            guild_name_font_size = 130
+            guild_name_font_outline_size = 132
+            server_name = "This server"
 
-            poppins = Font.poppins(size=guild_name_font_size, variant='bold')
-            poppins_outline = Font.poppins(
-                size=guild_name_font_outline_size, variant='bold')
-            poppins_small = Font.poppins(size=75, variant='bold')
-            poppins_small_outline = Font.poppins(size=76, variant='bold')
+        poppins = Font.poppins(size=guild_name_font_size, variant='bold')
+        poppins_outline = Font.poppins(
+            size=guild_name_font_outline_size, variant='bold')
+        poppins_small = Font.poppins(size=75, variant='bold')
+        poppins_small_outline = Font.poppins(size=76, variant='bold')
 
-            background.paste(profile, (750, 330))
-            background.ellipse((750, 330), 420, 420,
-                               outline='white', stroke_width=7)
+        background.paste(profile, (750, 330))
+        background.ellipse((750, 330), 420, 420,
+                           outline='white', stroke_width=7)
 
-            background.text(
-                (960, 54), "Welcome to", color='black', font=poppins_small_outline, align='center')
-            background.text(
-                (960, 50), "Welcome to", color='white', font=poppins_small, align='center')
+        background.text(
+            (960, 54), "Welcome to", color='black', font=poppins_small_outline, align='center')
+        background.text(
+            (960, 50), "Welcome to", color='white', font=poppins_small, align='center')
 
-            background.text(
-                (960, 164), server_name, color='black', font=poppins_outline, align='center')
-            background.text(
-                (960, 160), server_name, color='white', font=poppins, align='center')
+        background.text(
+            (960, 164), server_name, color='black', font=poppins_outline, align='center')
+        background.text(
+            (960, 160), server_name, color='white', font=poppins, align='center')
 
-            background.text((960, 854), f"{member.name}#{member.discriminator}",
-                            color='black', font=poppins_small_outline, align='center')
-            background.text((960, 850), f"{member.name}#{member.discriminator}",
-                            color='white', font=poppins_small, align='center')
+        background.text((960, 854), f"{member.name}#{member.discriminator}",
+                        color='black', font=poppins_small_outline, align='center')
+        background.text((960, 850), f"{member.name}#{member.discriminator}",
+                        color='white', font=poppins_small, align='center')
 
-            welcome_img = discord.File(
-                fp=background.image_bytes, filename="welcome.jpg")
-            try:
-                await channel.send(f"{member.mention}", file=welcome_img)
-            except AttributeError:
-                try:
-                    embed = ErrorEmbed()
-                    embed.title = "\u26d4 The welcome channel was not found in the server."
-                    await member.guild.system_channel.send(embed=embed)
-                except:
-                    pass
+        welcome_img = discord.File(
+            fp=background.image_bytes, filename="welcome.jpg")
+        try:
+            await channel.send(f"{member.mention}", file=welcome_img)
+        except AttributeError:
+            with contextlib.suppress(Exception):
+                embed = ErrorEmbed()
+                embed.title = "\u26d4 The welcome channel was not found in the server."
+                await member.guild.system_channel.send(embed=embed)
 
 
 async def setup(bot: Bot):

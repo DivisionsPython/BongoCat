@@ -29,14 +29,13 @@ class Economy(commands.Cog):
         '''Create a new economy account.'''
         if await user_is_known(self.bot.dbcursor, ctx.author.id):
             raise CustomException("You already have an account")
-        else:
-            await add_user(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id)
+        await add_user(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id)
 
-            embed = SuccessEmbed()
-            embed.title = f"\u2705 {ctx.author.name}'s account created"
-            embed.add_field(
-                name="Info", value='You have a 0.07% chance of getting a random amount of coins between **0$** and **100$**')
-            await ctx.channel.send(embed=embed)
+        embed = SuccessEmbed()
+        embed.title = f"\u2705 {ctx.author.name}'s account created"
+        embed.add_field(
+            name="Info", value='You have a 0.07% chance of getting a random amount of coins between **0$** and **100$**')
+        await ctx.channel.send(embed=embed)
 
     @commands.command(description="Delete your economy system account. It's sad to see you go :(")
     async def delaccount(self, ctx: commands.Context):
@@ -87,37 +86,74 @@ class Economy(commands.Cog):
     @commands.command(aliases=["dep"], description="Deposit coins from your wallet to your bank.")
     async def deposit(self, ctx: commands.Context, amount=None):
         '''Deposit coins from your wallet to your bank.'''
-        if await user_is_known(self.bot.dbcursor, ctx.author.id):
-            success = SuccessEmbed()
+        if not await user_is_known(self.bot.dbcursor, ctx.author.id):
+            raise CustomException("You don't have an account")
+        success = SuccessEmbed()
 
-            wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
-            bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
+        wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
+        bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
 
-            if amount == None:
-                raise CustomException("How much money do you want to deposit?")
+        if amount is None:
+            raise CustomException("How much money do you want to deposit?")
 
-            elif str(amount).lower() in ["all", "max"]:
-                if wallet == 0:
+        elif str(amount).lower() in {"all", "max"}:
+            if wallet == 0:
+
+                missingCoins = CustomException("Deposit denied")
+
+                missingCoins.errorEmbed.add_field(
+                    name="Reason:", value="Your wallet is empty.")
+
+                raise missingCoins
+
+            else:
+
+                await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet-wallet)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank+wallet)
+
+                success.title = '\u2705 Deposit successfull'
+                success.add_field(name="Deposit amount:",
+                                  value=f"{wallet}$", inline=False)
+
+                wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
+                bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
+
+                success.add_field(
+                    name="New wallet value:", value=f"{wallet}$", inline=True)
+                success.add_field(
+                    name="New bank value:", value=f"{bank}$", inline=True)
+
+                await ctx.channel.send(embed=success)
+
+        else:
+
+            try:
+                amount = int(amount)
+                if wallet < amount:
 
                     missingCoins = CustomException("Deposit denied")
 
-                    missingCoins.errorEmbed.add_field(
-                        name="Reason:", value="Your wallet is empty.")
+                    if wallet == 0:
+                        missingCoins.errorEmbed.add_field(
+                            name="Reason:", value="Your wallet is empty.")
+
+                    else:
+                        missingCoins.errorEmbed.add_field(
+                            name="Reason:", value=f"You can't deposit **{amount}$** in the bank because you only have **{wallet}$** in your wallet.")
 
                     raise missingCoins
 
                 else:
 
-                    await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet-wallet)
-                    await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank+wallet)
-
-                    success.title = '\u2705 Deposit successfull'
-                    success.add_field(name="Deposit amount:",
-                                      value=f"{wallet}$", inline=False)
+                    await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet-amount)
+                    await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank+amount)
 
                     wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
                     bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
 
+                    success.title = '\u2705 Deposit successfull'
+                    success.add_field(name="Deposit amount:",
+                                      value=f"{amount}$", inline=False)
                     success.add_field(
                         name="New wallet value:", value=f"{wallet}$", inline=True)
                     success.add_field(
@@ -125,83 +161,82 @@ class Economy(commands.Cog):
 
                     await ctx.channel.send(embed=success)
 
-            else:
-
-                try:
-                    amount = int(amount)
-                    if wallet < amount:
-
-                        missingCoins = CustomException("Deposit denied")
-
-                        if wallet == 0:
-                            missingCoins.errorEmbed.add_field(
-                                name="Reason:", value="Your wallet is empty.")
-
-                        else:
-                            missingCoins.errorEmbed.add_field(
-                                name="Reason:", value=f"You can't deposit **{amount}$** in the bank because you only have **{wallet}$** in your wallet.")
-
-                        raise missingCoins
-
-                    else:
-
-                        await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet-amount)
-                        await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank+amount)
-
-                        wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
-                        bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
-
-                        success.title = '\u2705 Deposit successfull'
-                        success.add_field(name="Deposit amount:",
-                                          value=f"{amount}$", inline=False)
-                        success.add_field(
-                            name="New wallet value:", value=f"{wallet}$", inline=True)
-                        success.add_field(
-                            name="New bank value:", value=f"{bank}$", inline=True)
-
-                        await ctx.channel.send(embed=success)
-
-                except ValueError:
-                    raise CustomException("That's not a number or `all`/`max`")
-
-        else:
-            raise CustomException("You don't have an account")
+            except ValueError as e:
+                raise CustomException(
+                    "That's not a number or `all`/`max`") from e
 
     @commands.command(aliases=["with"], description="Withdraw coins from your bank to your wallet.")
     async def withdraw(self, ctx: commands.Context, amount=None):
         '''Withdraw coins from your bank to your wallet.'''
-        if await user_is_known(self.bot.dbcursor, ctx.author.id):
-            success = SuccessEmbed()
+        if not await user_is_known(self.bot.dbcursor, ctx.author.id):
+            raise CustomException("You don't have an account")
+        success = SuccessEmbed()
 
-            wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
-            bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
+        wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
+        bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
 
-            if amount == None:
-                raise CustomException(
-                    "How much money do you want to withdraw?")
+        if amount is None:
+            raise CustomException(
+                "How much money do you want to withdraw?")
 
-            elif str(amount).lower() in ["all", "max"]:
-                if bank == 0:
+        elif str(amount).lower() in {"all", "max"}:
+            if bank == 0:
+
+                missingCoins = CustomException("Withdraw denied")
+
+                missingCoins.errorEmbed.add_field(
+                    name="Reason:", value="Your bank is empty.")
+
+                raise missingCoins
+
+            else:
+
+                await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+bank)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank-bank)
+
+                success.title = '\u2705 Withdraw successfull'
+                success.add_field(name="Withdraw amount:",
+                                  value=f"{bank}$", inline=False)
+
+                wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
+                bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
+
+                success.add_field(
+                    name="New wallet value:", value=f"{wallet}$", inline=True)
+                success.add_field(
+                    name="New bank value:", value=f"{bank}$", inline=True)
+
+                await ctx.channel.send(embed=success)
+
+        else:
+
+            try:
+                amount = int(amount)
+                if bank < amount:
 
                     missingCoins = CustomException("Withdraw denied")
 
-                    missingCoins.errorEmbed.add_field(
-                        name="Reason:", value="Your bank is empty.")
+                    if bank == 0:
+                        missingCoins.errorEmbed.add_field(
+                            name="Reason:", value="Your bank is empty.")
+
+                    else:
+                        missingCoins.errorEmbed.add_field(
+                            name="Reason:", value=f"You can't withdraw **{amount}$** from the bank because you only have **{bank}$**.")
 
                     raise missingCoins
 
                 else:
 
-                    await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+bank)
-                    await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank-bank)
-
-                    success.title = '\u2705 Withdraw successfull'
-                    success.add_field(name="Withdraw amount:",
-                                      value=f"{bank}$", inline=False)
+                    await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+amount)
+                    await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank-amount)
 
                     wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
                     bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
 
+                    success.title = '\u2705 Withdraw successfull'
+                    success.add_field(name="Withdraw amount:",
+                                      value=f"{amount}$", inline=False)
                     success.add_field(
                         name="New wallet value:", value=f"{wallet}$", inline=True)
                     success.add_field(
@@ -209,47 +244,9 @@ class Economy(commands.Cog):
 
                     await ctx.channel.send(embed=success)
 
-            else:
-
-                try:
-                    amount = int(amount)
-                    if bank < amount:
-
-                        missingCoins = CustomException("Withdraw denied")
-
-                        if bank == 0:
-                            missingCoins.errorEmbed.add_field(
-                                name="Reason:", value="Your bank is empty.")
-
-                        else:
-                            missingCoins.errorEmbed.add_field(
-                                name="Reason:", value=f"You can't withdraw **{amount}$** from the bank because you only have **{bank}$**.")
-
-                        raise missingCoins
-
-                    else:
-
-                        await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+amount)
-                        await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, bank-amount)
-
-                        wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
-                        bank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
-
-                        success.title = '\u2705 Withdraw successfull'
-                        success.add_field(name="Withdraw amount:",
-                                          value=f"{amount}$", inline=False)
-                        success.add_field(
-                            name="New wallet value:", value=f"{wallet}$", inline=True)
-                        success.add_field(
-                            name="New bank value:", value=f"{bank}$", inline=True)
-
-                        await ctx.channel.send(embed=success)
-
-                except ValueError:
-                    raise CustomException("That's not a number or `all`/`max`")
-
-        else:
-            raise CustomException("You don't have an account")
+            except ValueError as e:
+                raise CustomException(
+                    "That's not a number or `all`/`max`") from e
 
     @commands.command(aliases=["bal"], description="Check your (or a user's) balance.")
     async def balance(self, ctx: commands.Context, member: discord.Member = None):
@@ -281,28 +278,26 @@ class Economy(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def beg(self, ctx: commands.Context):
         '''Have a chance of getting free coins.'''
-        if await user_is_known(self.bot.dbcursor, ctx.author.id):
-            if random.random() < 42/100:  # chance of the beg to be successful
+        if not await user_is_known(self.bot.dbcursor, ctx.author.id):
+            raise CustomException("You don't have an account")
+        if random.random() < 42/100:  # chance of the beg to be successful
 
-                wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
+            wallet = await fetch_wallet(self.bot.dbcursor, ctx.author.id)
 
-                if random.random() < 8/100:  # chance of the beg to give more than 500 coins
-                    amount = random.randrange(500, 1001)
-                else:  # else less than 500 coins
-                    amount = random.randrange(1, 500)
+            if random.random() < 8/100:  # chance of the beg to give more than 500 coins
+                amount = random.randrange(500, 1001)
+            else:  # else less than 500 coins
+                amount = random.randrange(1, 500)
 
-                await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+amount)
+            await update_wallet(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, wallet+amount)
 
-                if amount > 500:
-                    await ctx.channel.send(f"You got very lucky, {getName()} gave you **{amount}$**")
-                else:
-                    await ctx.channel.send(f"Good job, {getName()} gave you **{amount}$**")
-
+            if amount > 500:
+                await ctx.channel.send(f"You got very lucky, {getName()} gave you **{amount}$**")
             else:
-                await ctx.channel.send(f"Unfortunately, {getName()} didn't want to give you any money.")
+                await ctx.channel.send(f"Good job, {getName()} gave you **{amount}$**")
 
         else:
-            raise CustomException("You don't have an account")
+            await ctx.channel.send(f"Unfortunately, {getName()} didn't want to give you any money.")
 
     @commands.command(aliases=["rob"], cooldown_after_parsing=True, description="Oh so you're a real criminal \U0001f977 Try to get some money from someone's bank. Pay attention to don't get caught \U0001f693")
     @commands.cooldown(1, 90, commands.BucketType.user)
@@ -315,73 +310,62 @@ class Economy(commands.Cog):
             ctx.command.reset_cooldown(ctx)
             await ctx.channel.send(f"Do you really want to rob yourself? \U0001f602")
 
-        else:
-            if await user_is_known(self.bot.dbcursor, ctx.author.id):
-                if await user_is_known(self.bot.dbcursor, member.id):
-                    ctxBank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
-                    memberBank = await fetch_bank(self.bot.dbcursor, member.id)
-                    if memberBank < 500:
-                        error.title = f"\u26d4 {member.name} doesn't have enough money in their bank"
-                        error.add_field(
-                            name="Details", value=f'The minimum coins required are **500$**, and {member.name} only has **{memberBank}$** in their bank.')
-                        ctx.command.reset_cooldown(ctx)
-                        await ctx.channel.send(embed=error)
-                    elif ctxBank < 500:
-                        error.title = "\u26d4 You don't have enough money in your bank"
-                        error.add_field(
-                            name="Details", value=f'The minimum coins required are **500$**, and you only have **{ctxBank}$** in your bank.')
-                        ctx.command.reset_cooldown(ctx)
-                        await ctx.channel.send(embed=error)
-                    else:
-                        if random.random() < 30/100:  # chance of the rob to be successful
-                            if memberBank < 2000:  # if the robbed user bank has less than 2000 coins
-                                amount = random.randrange(1, (memberBank+1))
-                            else:  # else if the robbed user bank has more than 2000 coins
-                                if random.random() < 8/100:  # chance of the rob to give more than 2000 coins
-                                    amount = random.randrange(
-                                        2000, (memberBank+1))
-                                else:  # else less than 2000 coins
-                                    maxCoins = random.randrange(
-                                        memberBank, 2000)
-                                    amount = random.randrange(1, maxCoins)
+        elif await user_is_known(self.bot.dbcursor, ctx.author.id):
+            if not await user_is_known(self.bot.dbcursor, member.id):
+                raise CustomException("This user hasn't an account yet")
 
-                            await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, ctxBank+amount)
-                            await update_bank(self.bot.dbconnection, self.bot.dbcursor, member.id, memberBank-amount)
+            ctxBank = await fetch_bank(self.bot.dbcursor, ctx.author.id)
+            memberBank = await fetch_bank(self.bot.dbcursor, member.id)
+            if memberBank < 500:
+                error.title = f"\u26d4 {member.name} doesn't have enough money in their bank"
+                error.add_field(
+                    name="Details", value=f'The minimum coins required are **500$**, and {member.name} only has **{memberBank}$** in their bank.')
+                ctx.command.reset_cooldown(ctx)
+                await ctx.channel.send(embed=error)
+            elif ctxBank < 500:
+                error.title = "\u26d4 You don't have enough money in your bank"
+                error.add_field(
+                    name="Details", value=f'The minimum coins required are **500$**, and you only have **{ctxBank}$** in your bank.')
+                ctx.command.reset_cooldown(ctx)
+                await ctx.channel.send(embed=error)
+            elif random.random() < 30/100:  # chance of the rob to be successful
+                if memberBank < 2000:  # if the robbed user bank has less than 2000 coins
+                    amount = random.randrange(1, (memberBank+1))
+                elif random.random() < 8/100:  # chance of the rob to give more than 2000 coins
+                    amount = random.randrange(
+                        2000, (memberBank+1))
+                else:  # else less than 2000 coins
+                    maxCoins = random.randrange(
+                        memberBank, 2000)
+                    amount = random.randrange(1, maxCoins)
 
-                            if amount >= 2000:
-                                success.title = '\U0001f4b8 The robbery was successful and you got very lucky!'
-                                success.add_field(
-                                    name="You got:", value=f'{amount}$')
-                                await ctx.channel.send(embed=success)
-                            else:
-                                success.title = '\U0001f4b8 The robbery was successful!'
-                                success.add_field(
-                                    name="You got:", value=f'{amount}$')
-                                await ctx.channel.send(embed=success)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, ctxBank+amount)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, member.id, memberBank-amount)
 
-                        else:
-                            amount = random.randrange(1, 501)
-                            await update_bank(self.bot.dbconnection, self.bot.dbcursor, member.id, memberBank+amount)
-                            await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, ctxBank-amount)
-                            await ctx.channel.send(f"Unfortunately, you got caugth by the police \U0001f693 and had to pay **{amount}$** to {member.mention}")
+                success.title = '\U0001f4b8 The robbery was successful and you got very lucky!' if amount >= 2000 else '\U0001f4b8 The robbery was successful!'
 
-                else:
-                    raise CustomException("This user hasn't an account yet")
-
+                success.add_field(
+                    name="You got:", value=f'{amount}$')
+                await ctx.channel.send(embed=success)
             else:
-                raise CustomException("You don't have an account")
+                amount = random.randrange(1, 501)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, member.id, memberBank+amount)
+                await update_bank(self.bot.dbconnection, self.bot.dbcursor, ctx.author.id, ctxBank-amount)
+                await ctx.channel.send(f"Unfortunately, you got caugth by the police \U0001f693 and had to pay **{amount}$** to {member.mention}")
+
+        else:
+            raise CustomException("You don't have an account")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if await user_is_known(self.bot.dbcursor, message.author.id):
-            if random.random() < 0.07/100:
-                wallet = await fetch_wallet(self.bot.dbcursor, message.author.id)
-                amount = random.randrange(0, 101)
-                if amount == 0:
-                    await message.channel.send(f"Sadly, {message.author.name} found a wallet on the street but it was empty \U0001f614")
-                else:
-                    await update_wallet(self.bot.dbconnection, self.bot.dbcursor, message.author.id, wallet+amount)
-                    await message.channel.send(f"{message.author.name}, you got lucky and randomly gained {amount}$ \U0001f604")
+        if await user_is_known(self.bot.dbcursor, message.author.id) and random.random() < 0.07 / 100:
+            wallet = await fetch_wallet(self.bot.dbcursor, message.author.id)
+            amount = random.randrange(0, 101)
+            if amount == 0:
+                await message.channel.send(f"Sadly, {message.author.name} found a wallet on the street but it was empty \U0001f614")
+            else:
+                await update_wallet(self.bot.dbconnection, self.bot.dbcursor, message.author.id, wallet+amount)
+                await message.channel.send(f"{message.author.name}, you got lucky and randomly gained {amount}$ \U0001f604")
 
 
 async def setup(bot: Bot):

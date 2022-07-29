@@ -40,12 +40,8 @@ class MyHelpCommand(commands.MinimalHelpCommand):
         return f"{self.context.clean_prefix}{command.qualified_name} {command.signature}"
 
     async def _cog_select_options(self) -> list[discord.SelectOption]:
-        options: list[discord.SelectOption] = []
-        options.append(discord.SelectOption(
-            label="Home",
-            emoji="\U0001f3e0",
-            description="Go back to the main menu.",
-        ))
+        options: list[discord.SelectOption] = [discord.SelectOption(
+            label="Home", emoji="\U0001f3e0", description="Go back to the main menu.")]
 
         for cog, command_set in self.get_bot_mapping().items():
             filtered = await self.filter_commands(command_set, sort=True)
@@ -127,10 +123,8 @@ class MyHelpCommand(commands.MinimalHelpCommand):
 
     async def cog_help_embed(self, cog: Optional[commands.Cog]) -> Embed:
         if cog is None:
-            return await self._help_embed(
-                title=f"No category",
-                command_set=self.get_bot_mapping()[None]
-            )
+            return await self._help_embed(title="No category", command_set=self.get_bot_mapping()[None])
+
         emoji = getattr(cog, "COG_EMOJI", None)
         return await self._help_embed(
             title=f"{emoji} {cog.qualified_name}" if emoji else cog.qualified_name,

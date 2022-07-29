@@ -37,10 +37,7 @@ async def fetch_guild(database_cursor: aiosqlite.Cursor, guild: int | discord.Gu
     """
     await database_cursor.execute('SELECT guild_id FROM welcomer WHERE guild_id = :guild_id', {'guild_id': guild})
     output = await database_cursor.fetchone()
-    if output is not None:
-        return output[0]
-    else:
-        return output
+    return output[0] if output is not None else output
 
 
 async def guild_is_known(database_cursor: aiosqlite.Cursor, guild: int | discord.Guild) -> bool:

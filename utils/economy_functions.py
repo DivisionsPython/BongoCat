@@ -36,10 +36,7 @@ async def fetch_user_economy(database_cursor: aiosqlite.Cursor, user: int | disc
     """
     await database_cursor.execute('SELECT user_id FROM economy WHERE user_id = :user_id', {'user_id': user})
     output = await database_cursor.fetchone()
-    if output is not None:
-        return output[0]
-    else:
-        return output
+    return output[0] if output is not None else output
 
 
 async def fetch_user_animals(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
@@ -51,10 +48,7 @@ async def fetch_user_animals(database_cursor: aiosqlite.Cursor, user: int | disc
     """
     await database_cursor.execute('SELECT user_id FROM animals WHERE user_id = :user_id', {'user_id': user})
     output = await database_cursor.fetchone()
-    if output is not None:
-        return output[0]
-    else:
-        return output
+    return output[0] if output is not None else output
 
 
 async def fetch_user_weapons(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> aiosqlite.Row | None:
@@ -66,10 +60,7 @@ async def fetch_user_weapons(database_cursor: aiosqlite.Cursor, user: int | disc
     """
     await database_cursor.execute('SELECT user_id FROM weapons WHERE user_id = :user_id', {'user_id': user})
     output = await database_cursor.fetchone()
-    if output is not None:
-        return output[0]
-    else:
-        return output
+    return output[0] if output is not None else output
 
 
 async def user_is_known(database_cursor: aiosqlite.Cursor, user: int | discord.User) -> bool:

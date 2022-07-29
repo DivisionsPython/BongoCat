@@ -33,7 +33,7 @@ class General(commands.Cog):
     @commands.command(aliases=["whois"], description="Check a user's profile details. Also download their avatar and banner ;)")
     async def userinfo(self, ctx: commands.Context, member: discord.Member = None):
         '''Check a user's profile details.'''
-        if member == None:
+        if member is None:
             member = ctx.author
 
         user = ctx.guild.get_member(member.id)
@@ -41,7 +41,7 @@ class General(commands.Cog):
         try:
             bannerUser = await self.bot.fetch_user(member.id)
             banner = str(bannerUser.banner.url)
-        except:
+        except Exception:
             banner = None
 
         view = View()
@@ -53,9 +53,7 @@ class General(commands.Cog):
             label='Download avatar', url=str(user.avatar.url), style=ButtonStyle.url)
         view.add_item(button1)
 
-        if user.display_avatar.url == user.avatar.url:
-            pass
-        else:
+        if user.display_avatar.url != user.avatar.url:
             button4 = Button(
                 label='Download server avatar', url=f'{user.display_avatar.url}', style=ButtonStyle.url)
             view.add_item(button4)
@@ -64,8 +62,6 @@ class General(commands.Cog):
             button2 = Button(
                 label='Download banner', url=banner, style=ButtonStyle.url)
             view.add_item(button2)
-        else:
-            pass
 
         created = user.created_at
         created = datetime.datetime.strftime(created, "%A, %d %B %Y\n%I:%M %p")
@@ -86,21 +82,14 @@ class General(commands.Cog):
                         value=created, inline=True)
         embed.add_field(name="Joined the server", value=joined, inline=True)
 
-        if user.display_name == user.name:
-            pass
-        else:
+        if user.display_name != user.name:
             embed.add_field(name="Server nickname",
                             value=user.display_name, inline=True)
 
         perms = []
         separated_perms = []
 
-        for name, value in user.guild_permissions:
-            if value:
-                perms.append(name)
-            else:
-                continue
-
+        perms.extend(name for name, value in user.guild_permissions if value)
         if user.id == ctx.guild.owner_id:
             separated_perms = ["Server owner"]
         else:
@@ -110,7 +99,7 @@ class General(commands.Cog):
                 reunited = reunited_lowercase.capitalize()
                 separated_perms.append(reunited)
 
-        chars = [x for x in separated_perms]
+        chars = list(separated_perms)
 
         if len(chars) > 1024:
             separated_perms = ["Too many to display"]
@@ -122,7 +111,7 @@ class General(commands.Cog):
         roles.append('@everyone')
 
         roles_value = " | ".join(roles)
-        chars = [x for x in roles_value]
+        chars = list(roles_value)
 
         if len(chars) > 1024:
             roles_value = ["Too many to display"]
