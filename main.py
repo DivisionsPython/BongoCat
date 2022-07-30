@@ -15,7 +15,7 @@ bot = Bot(
     command_prefix=commands.when_mentioned_or(dotenv.dotenv_values('.env')['PREFIX']), intents=intents, case_insensitive=True, help_command=MyHelpCommand())
 
 rightNow = datetime.datetime.now()
-rightNow = rightNow.strftime('discord_%d-%m-%Y_started_at_%H-%M-%S')
+rightNow = rightNow.strftime('LOG_date_{%d-%m-%Y}_started_at_{%H-%M-%S}')
 
 handler = logging.FileHandler(
     filename=f'./logs/{rightNow}.log', encoding='utf-8', mode='w')
